@@ -3,10 +3,11 @@ import { StyleSheet, Text, View, Button } from "react-native";
 import React, { useState } from "react";
 import Login from "./components/Auth.native";
 import HomeScreen from "./app/(tabs)/index";
+import { NavigationContainer } from "@react-navigation/native";
 
 export default function App() {
   console.log("Hello App file");
-  return <HomeScreen></HomeScreen>;
+  return <View></View>;
 
   {
     /* <View style={styles.container}>
@@ -23,15 +24,5 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
-  },
-  loginBox: {
-    borderRadius: 20,
-    shadowColor: "grey",
-    backgroundColor: "white",
-    height: 500,
-    width: 320,
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 5,
   },
 });

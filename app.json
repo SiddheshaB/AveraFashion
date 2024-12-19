@@ -2,6 +2,7 @@
   "expo": {
     "name": "StyleMeApp",
     "slug": "StyleMeApp",
+    "scheme": "com.anonymous.StyleMeApp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -30,7 +31,8 @@
       "@react-native-firebase/app",
       "@react-native-firebase/auth",
       "@react-native-firebase/crashlytics",
-      "@react-native-google-signin/google-signin"
+      "@react-native-google-signin/google-signin",
+      "expo-secure-store"
     ]
   }
 }
