@@ -9,7 +9,7 @@ async function signOutUser(dispatch) {
       console.error("Error signing out:", error.message);
     } else {
       console.log("User signed out successfully.");
-      dispatch(setActiveUser(false));
+      //dispatch(setActiveUser(false));
     }
     //return <></>;
   } catch (err) {

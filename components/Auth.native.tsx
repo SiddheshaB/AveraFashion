@@ -64,7 +64,7 @@ export default function GoogleLogin() {
     forceCodeForRefreshToken: true, // For long-lived refresh tokens
   });
   return (
-    <View>
+    <View style={{ flex: 1, backgroundColor: "red" }}>
       {user ? (
         <Text>Welcome, {user.email}!</Text>
       ) : (
