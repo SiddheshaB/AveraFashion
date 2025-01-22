@@ -1,18 +1,30 @@
-import { View, Text, StyleSheet, Button, Image, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  Image,
+  TextInput,
+  FlatList,
+} from "react-native";
 import signOut from "../../utils/signOut";
 import { useDispatch } from "react-redux";
 import { uploadToSupabase } from "../../components/SupabaseImageUpload";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { postDataUpload } from "../../components/PostDataUpload";
 //import { TextInput } from "react-native-gesture-handler";
 export default function AddPost() {
-  const [imageUri, setImageUri] = useState(null);
+  const [imageUri, setImageUri] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [supabaseUrl, setSupabaseUrl] = useState(null);
   const [title, setTitle] = useState(null);
   const [content, setContent] = useState(null);
   const dispatch = useDispatch();
+
+  /*   useEffect(() => {
+    if (!imageUri) return;
+  }); */
 
   const handleLogout = () => {
     signOut(dispatch);
@@ -38,25 +50,29 @@ export default function AddPost() {
       }
 
       if (!result.canceled) {
-        setImageUri(result.assets[0].uri);
-        console.log("Image uri: ", imageUri);
+        const postImages = result.assets.map((asset) => asset.uri);
+        //console.log("Multiple image uri:", postImages);
+        setImageUri(postImages);
+        //setImageUri(result.assets[0].uri);
+        if (!imageUri) return;
+        //setImageUri(newImages);
+        console.log("Image uri array: ", imageUri);
       }
-      if (!imageUri) return;
-      // Upload to Supabase
-      const supabaseDownloadURL = await uploadToSupabase(imageUri);
-      setSupabaseUrl(supabaseDownloadURL);
-      console.log("supabase download img: ", supabaseUrl);
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.error("Error uploading:", error);
     } finally {
       setIsLoading(false);
     }
   };
   const postData = async () => {
-    postDataUpload(title, content, supabaseUrl);
+    // Upload to Supabase
+    const supabaseDownloadURL = await uploadToSupabase(imageUri);
+    console.log("supabase download img: ", supabaseDownloadURL);
+    postDataUpload(title, content, supabaseDownloadURL);
     setTitle(null);
     setContent(null);
     setImageUri(null);
+    //setSupabaseUrl(null);
   };
   return (
     <View style={styles.container}>
@@ -67,13 +83,19 @@ export default function AddPost() {
           multiline
           numberOfLines={4}
           maxLength={40}
-          placeholder="Enter summary here..."
+          placeholder="Enter summary here...... max 250"
           style={styles.postSummary}
           onChangeText={(text) => setTitle(text)}
           value={title}
         ></TextInput>
         <Button title="Upload" onPress={handleImageUpload} />
-        <Image source={{ uri: imageUri }} style={{ width: 100, height: 100 }} />
+        <FlatList
+          data={imageUri}
+          renderItem={({ item }) => (
+            <Image source={{ uri: item }} style={{ width: 100, height: 100 }} />
+          )}
+          numColumns={2}
+        />
         <TextInput
           editable
           multiline

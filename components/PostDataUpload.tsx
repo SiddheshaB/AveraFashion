@@ -1,4 +1,3 @@
-import React from "react";
 import { supabase } from "../utils/supabase";
 
 export const postDataUpload = async (
@@ -18,7 +17,6 @@ export const postDataUpload = async (
     console.log(data);
 
     if (error) throw error;
-    //return <></>;
   } catch (error) {
     console.error("Error uploading data to Supabase table:", error);
     throw error;
