@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet } from "react-native";
-
+import DisplayAllPosts from "../../components/displayAllPosts";
 export default function Home() {
   return (
     <View style={styles.container}>
-      <Text>Welcome Homescreen..</Text>
+      <Text>Homescreen.. displayAllPosts</Text>
+      <DisplayAllPosts />
     </View>
   );
 }

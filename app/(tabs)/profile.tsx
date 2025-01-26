@@ -1,5 +1,7 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Button } from "react-native";
 import { useSelector } from "react-redux";
+import uploadedPosts from "../../components/uploadedPosts";
+import displayAllPosts from "../../components/displayAllPosts";
 
 export default function Profile() {
   const users = useSelector((state: any) => state.users[0].userInfo);
@@ -11,6 +13,7 @@ export default function Profile() {
       <View style={styles.profileCard}>
         <Text>{users.user.email}</Text>
         <Text>{users.user.user_metadata.full_name}</Text>
+        <Button title="MyPosts" onPress={uploadedPosts}></Button>
       </View>
     </View>
   );

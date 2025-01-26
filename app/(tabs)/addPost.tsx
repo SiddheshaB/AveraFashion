@@ -17,14 +17,9 @@ import { postDataUpload } from "../../components/PostDataUpload";
 export default function AddPost() {
   const [imageUri, setImageUri] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [supabaseUrl, setSupabaseUrl] = useState(null);
   const [title, setTitle] = useState(null);
   const [content, setContent] = useState(null);
   const dispatch = useDispatch();
-
-  /*   useEffect(() => {
-    if (!imageUri) return;
-  }); */
 
   const handleLogout = () => {
     signOut(dispatch);
@@ -51,11 +46,8 @@ export default function AddPost() {
 
       if (!result.canceled) {
         const postImages = result.assets.map((asset) => asset.uri);
-        //console.log("Multiple image uri:", postImages);
         setImageUri(postImages);
-        //setImageUri(result.assets[0].uri);
         if (!imageUri) return;
-        //setImageUri(newImages);
         console.log("Image uri array: ", imageUri);
       }
     } catch (error) {
