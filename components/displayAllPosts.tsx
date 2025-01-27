@@ -1,29 +1,40 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "../utils/supabase";
 import React from "react";
-import { FlatList, Text, View, Image, Dimensions } from "react-native";
+import { FlatList, Text, View, Image, Dimensions, RefreshControl } from "react-native";
 import Swiper from "react-native-swiper";
-console.log("On uploaded posts");
+
 export default function DisplayAllPosts() {
   const [postdata, setData] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchData = async () => {
+    try {
+      const { data: tableData, error } = await supabase
+        .from("posts")
+        .select("*");
+      setData(tableData);
+    } catch (error) {
+      console.error("Error retrieving data from Supabase:", error);
+      throw error;
+    }
+  };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchData().then(() => setRefreshing(false));
+  }, []);
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data: tableData, error } = await supabase
-          .from("posts")
-          .select("*");
-        setData(tableData);
-      } catch (error) {
-        console.error("Error retrieving data from Supabase:", error);
-        throw error;
-      }
-    };
     fetchData();
   }, []);
 
   return (
     <FlatList
       data={postdata}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
       renderItem={({ item }) => (
         <View
           style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
