@@ -2,32 +2,28 @@ import {
   View,
   Text,
   StyleSheet,
-  Button,
   Image,
   TextInput,
   FlatList,
+  ScrollView,
+  TouchableOpacity,
 } from "react-native";
-import signOut from "../../utils/signOut";
-import { useDispatch } from "react-redux";
+
 import { uploadToSupabase } from "../../components/SupabaseImageUpload";
 import React, { useEffect, useRef, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { postDataUpload } from "../../components/PostDataUpload";
-//import { TextInput } from "react-native-gesture-handler";
+
 export default function AddPost() {
   const [imageUri, setImageUri] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState(null);
   const [content, setContent] = useState(null);
-  const dispatch = useDispatch();
 
-  const handleLogout = () => {
-    signOut(dispatch);
-  };
   const handleImageUpload = async () => {
     try {
       setIsLoading(true);
-      // No permissions request is necessary for launching the image library
+      // Permissions request is necessary for launching the image library
       const permissionResult =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       let result = await ImagePicker.launchImageLibraryAsync({
@@ -56,6 +52,7 @@ export default function AddPost() {
       setIsLoading(false);
     }
   };
+
   const postData = async () => {
     // Upload to Supabase
     const supabaseDownloadURL = await uploadToSupabase(imageUri);
@@ -64,62 +61,113 @@ export default function AddPost() {
     setTitle(null);
     setContent(null);
     setImageUri(null);
-    //setSupabaseUrl(null);
   };
+
   return (
     <View style={styles.container}>
-      <Button title="Logout" onPress={handleLogout}></Button>
-      <View style={styles.postBox}>
-        <TextInput
-          editable
-          multiline
-          numberOfLines={4}
-          maxLength={40}
-          placeholder="Enter summary here...... max 250"
-          style={styles.postSummary}
-          onChangeText={(text) => setTitle(text)}
-          value={title}
-        ></TextInput>
-        <Button title="Upload" onPress={handleImageUpload} />
-        <FlatList
-          data={imageUri}
-          renderItem={({ item }) => (
-            <Image source={{ uri: item }} style={{ width: 100, height: 100 }} />
-          )}
-          numColumns={2}
-        />
-        <TextInput
-          editable
-          multiline
-          numberOfLines={10}
-          maxLength={200}
-          placeholder="Enter body here..."
-          style={styles.postSummary}
-          onChangeText={(text) => setContent(text)}
-          value={content}
-        ></TextInput>
-        <Button title="Submit" onPress={postData} />
-      </View>
+     
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.postBox}>
+          <TextInput
+            editable
+            multiline
+            numberOfLines={4}
+            maxLength={40}
+            placeholder="Enter title here..."
+            style={styles.postSummary}
+            onChangeText={(text) => setTitle(text)}
+            value={title}
+          ></TextInput>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleImageUpload}
+          >
+            <Text style={styles.buttonText}>Upload</Text>
+          </TouchableOpacity>
+          <FlatList
+            data={imageUri}
+            renderItem={({ item }) => (
+              <Image source={{ uri: item }} style={{ width: 100, height: 100 }} />
+            )}
+            numColumns={2}
+            scrollEnabled={false}
+          />
+          <TextInput
+            editable
+            multiline
+            numberOfLines={10}
+            maxLength={200}
+            placeholder="Enter body here..."
+            style={styles.postContent}
+            onChangeText={(text) => setContent(text)}
+            value={content}
+          ></TextInput>
+          <TouchableOpacity
+            style={[styles.button, styles.submitButton]}
+            onPress={postData}
+          >
+            <Text style={styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
+    paddingVertical: 20,
   },
   postBox: {
     borderRadius: 20,
     shadowColor: "grey",
     backgroundColor: "white",
-    height: 500,
     width: 320,
+    padding: 20,
     alignItems: "center",
     justifyContent: "center",
     elevation: 5,
+    gap: 15,
   },
   postSummary: {
-    height: 80,
+    width: "100%",
+    minHeight: 80,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 10,
+    textAlignVertical: "top",
+  },
+  postContent: {
+    width: "100%",
+    minHeight: 150,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 10,
+    textAlignVertical: "top",
+  },
+  button: {
+    backgroundColor: "#f0f0f0",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    width: "100%",
+    alignItems: "center",
+  },
+  submitButton: {
+    backgroundColor: "#e8e8e8",
+    marginTop: 10,
+  },
+  buttonText: {
+    fontSize: 16,
+    color: "#666",
+    fontWeight: "500",
   },
 });

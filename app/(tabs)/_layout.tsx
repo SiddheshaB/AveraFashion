@@ -21,14 +21,13 @@ export default function TabLayout() {
         console.error("Error retrieving session:", error.message);
       } else if (session) {
         setUser(session);
-        console.log("Restore session data:" + JSON.stringify(session));
-        //console.log(user);
+    
+      
         dispatch(setUserInfo(session));
-        // dispatch(setActiveUser(true));
-        //console.log(user.user_metadata.full_name);
+       
       } else {
         console.log("No session found.");
-        //dispatch(setActiveUser(false));
+        
       }
       setLoading(false);
     };

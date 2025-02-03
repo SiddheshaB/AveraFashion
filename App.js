@@ -1,9 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, Button } from "react-native";
 import React, { useState } from "react";
-import Login from "./components/Auth.native";
-import HomeScreen from "./app/(tabs)/index";
-import { NavigationContainer } from "@react-navigation/native";
 
 export default function App() {
   console.log("Hello App file");
