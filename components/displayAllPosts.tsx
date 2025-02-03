@@ -15,7 +15,7 @@ export default function DisplayAllPosts() {
     try {
       const { data: tableData, error } = await supabase
         .from("posts")
-        .select("title,image_url,content,post_id,user_id")
+        .select("title,image_url,content,post_id,user_id, profiles(full_name, avatar_url)")
         .order("created_at", { ascending: false });
       setPostData(tableData);
       console.log("Post data: ", tableData);
@@ -85,8 +85,37 @@ export default function DisplayAllPosts() {
               elevation: 5,
             }}
           >
-            <Text style={{ fontSize: 14, fontWeight: "bold", color: "black" }}> 
-              {item.title}</Text>
+            <View style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              alignSelf: 'stretch',
+              marginBottom: 12,
+              paddingHorizontal: 4
+            }}>
+              <Image
+                source={{ uri: item.profiles.avatar_url }}
+                style={{ 
+                  width: 40, 
+                  height: 40,
+                  borderRadius: 20,
+                  borderWidth: 1,
+                  borderColor: '#e0e0e0'
+                }}
+              />
+              <Text style={{ 
+                fontSize: 14, 
+                fontWeight: "600", 
+                color: "black",
+                marginLeft: 10
+              }}>{item.profiles.full_name}</Text>
+            </View>
+            <Text style={{ 
+              fontSize: 14, 
+              fontWeight: "bold", 
+              color: "black",
+              alignSelf: 'stretch',
+              marginBottom: 8
+            }}>{item.title}</Text>
            <Swiper
               style={{ height: 350,}}
               loop={false}
