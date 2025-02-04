@@ -124,9 +124,6 @@ export default function DisplayAllPosts() {
                 </TouchableOpacity>
               ))}
             </Swiper>
-
-            {/* Post Content Preview */}
-            <Text>{item.content}</Text>
           </View>
         )}
         style={styles.flatList}
