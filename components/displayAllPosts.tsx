@@ -16,8 +16,9 @@ export default function DisplayAllPosts() {
   const [refreshing, setRefreshing] = useState(false); // Pull-to-refresh state
   const [selectedFilter, setSelectedFilter] = useState("all"); // Filter toggle state
   
-  // Get user info from Redux store
-  const user = useSelector((state: any) => state.users[0].userInfo);
+  // Get user info from Redux store with null check
+  const users = useSelector((state: any) => state.users);
+  const user = users?.[0]?.userInfo;
 
   // Fetch posts from Supabase database
   const fetchData = async () => {
@@ -27,16 +28,16 @@ export default function DisplayAllPosts() {
         .from("posts")
         .select("title,image_url,content,post_id,user_id, profiles(full_name, avatar_url)")
         .order("created_at", { ascending: false });
-      setPostData(tableData);
+      if (error) throw error;
+      setPostData(tableData || []);
       console.log("Post data: ", tableData);
     } catch (error) {
       console.error("Error retrieving data from Supabase:", error);
-      throw error;
     }
   };
 
   // Filter posts based on selected filter (all posts or user's posts)
-  const filteredPosts = selectedFilter === "my" 
+  const filteredPosts = selectedFilter === "my" && user
     ? postdata.filter(post => post.user_id === user.user.id)
     : postdata;
 
@@ -54,32 +55,34 @@ export default function DisplayAllPosts() {
   return (
     <View style={styles.container}>
       {/* Filter Toggle Buttons */}
-      <View style={styles.filterContainer}>
-        <TouchableOpacity 
-          style={[
-            styles.filterButton,
-            selectedFilter === "all" && styles.filterButtonActive
-          ]}
-          onPress={() => setSelectedFilter("all")}
-        >
-          <Text style={[
-            styles.filterButtonText,
-            selectedFilter === "all" && styles.filterButtonTextActive
-          ]}>All Posts</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[
-            styles.filterButton,
-            selectedFilter === "my" && styles.filterButtonActive
-          ]}
-          onPress={() => setSelectedFilter("my")}
-        >
-          <Text style={[
-            styles.filterButtonText,
-            selectedFilter === "my" && styles.filterButtonTextActive
-          ]}>My Posts</Text>
-        </TouchableOpacity>
-      </View>
+      {user && (
+        <View style={styles.filterContainer}>
+          <TouchableOpacity 
+            style={[
+              styles.filterButton,
+              selectedFilter === "all" && styles.filterButtonActive
+            ]}
+            onPress={() => setSelectedFilter("all")}
+          >
+            <Text style={[
+              styles.filterButtonText,
+              selectedFilter === "all" && styles.filterButtonTextActive
+            ]}>All Posts</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[
+              styles.filterButton,
+              selectedFilter === "my" && styles.filterButtonActive
+            ]}
+            onPress={() => setSelectedFilter("my")}
+          >
+            <Text style={[
+              styles.filterButtonText,
+              selectedFilter === "my" && styles.filterButtonTextActive
+            ]}>My Posts</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Posts List */}
       <FlatList
