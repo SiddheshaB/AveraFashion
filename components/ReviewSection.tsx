@@ -65,13 +65,14 @@ type Review = {
 
 type ReviewSectionProps = {
   postId: string;  // ID of the post to show reviews for
+  postOwnerId: string;  // ID of the post owner
 };
 
 /**
  * ReviewSection Component
  * Displays a list of reviews for a post and allows users to add new reviews
  */
-export default function ReviewSection({ postId }: ReviewSectionProps) {
+export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProps) {
   // State Management
   const [reviews, setReviews] = useState<Review[]>([]);
   const [newReview, setNewReview] = useState('');
@@ -111,6 +112,52 @@ export default function ReviewSection({ postId }: ReviewSectionProps) {
     } catch (error) {
       console.error('Error fetching reviews:', error);
     }
+  };
+
+  /**
+   * Deletes a review from Supabase and updates the local state
+   */
+  const deleteReview = async (reviewId: string) => {
+    Alert.alert(
+      'Delete Review',
+      'Are you sure you want to delete this review?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel'
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const { error } = await supabase
+                .from('reviews')
+                .delete()
+                .eq('id', reviewId);
+
+              if (error) throw error;
+
+              // Update local state
+              const updatedReviews = reviews.filter(r => r.id !== reviewId);
+              setReviews(updatedReviews);
+
+              // Recalculate average rating
+              if (updatedReviews.length > 0) {
+                const newAvg = updatedReviews.reduce((sum, review) => sum + review.rating, 0) / updatedReviews.length;
+                setAverageRating(Math.round(newAvg * 10) / 10);
+              } else {
+                setAverageRating(0);
+              }
+
+            } catch (error) {
+              console.error('Error deleting review:', error);
+              Alert.alert('Error', 'Failed to delete review. Please try again.');
+            }
+          }
+        }
+      ]
+    );
   };
 
   /**
@@ -243,8 +290,18 @@ export default function ReviewSection({ postId }: ReviewSectionProps) {
         renderItem={({ item }) => (
           <View style={styles.reviewContainer}>
             <View style={styles.reviewHeader}>
-              <Text style={styles.userName}>{item.profiles.full_name}</Text>
-              <Text style={styles.timestamp}>{formatDate(item.created_at)}</Text>
+              <View style={styles.reviewHeaderLeft}>
+                <Text style={styles.userName}>{item.profiles.full_name}</Text>
+                <Text style={styles.timestamp}>{formatDate(item.created_at)}</Text>
+              </View>
+              {(postOwnerId === user?.user?.id || item.user_id === user?.user?.id) && (
+                <TouchableOpacity
+                  onPress={() => deleteReview(item.id)}
+                  style={styles.deleteButton}
+                >
+                  <FontAwesome name="trash-o" size={18} color="#ff4444" />
+                </TouchableOpacity>
+              )}
             </View>
             <StarRating rating={item.rating} size={16} />
             {item.review && (
@@ -311,6 +368,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 8,
+  },
+  reviewHeaderLeft: {
+    flex: 1,
+  },
+  deleteButton: {
+    padding: 4,
   },
   userName: {
     fontWeight: '600',

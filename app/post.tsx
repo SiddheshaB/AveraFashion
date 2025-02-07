@@ -68,7 +68,10 @@ export default function PostScreen() {
             </View>
 
             {/* Reviews Section */}
-            <ReviewSection postId={postData.post_id} />
+            <ReviewSection 
+              postId={postData.post_id} 
+              postOwnerId={postData.user_id}
+            />
           </>
         )
       }]
