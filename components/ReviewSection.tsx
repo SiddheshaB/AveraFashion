@@ -165,7 +165,16 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
    * Saves the review to Supabase and updates the local state
    */
   const addReview = async () => {
-    if (!user) return;
+    if (!user) {
+      Alert.alert('Error', 'You must be logged in to add a review');
+      return;
+    }
+
+    // Check if the current user is the post owner
+    if (user.user.id === postOwnerId) {
+      Alert.alert('Error', 'You cannot review your own post');
+      return;
+    }
 
     // Check if user has already reviewed
     const existingReview = reviews.find(r => r.user_id === user.user.id);
@@ -245,7 +254,7 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
       )}
 
       {/* Review Input Section */}
-      {user ? (
+      {user && user.user.id !== postOwnerId ? (
         <View style={styles.inputContainer}>
           <View style={styles.ratingContainer}>
             <Text style={styles.ratingLabel}>Your Rating:</Text>
@@ -279,7 +288,7 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
         </View>
       ) : (
         <Text style={styles.signInPrompt}>
-          Please sign in to leave a review
+          {!user ? "Please sign in to leave a review" : "You cannot review your own post"}
         </Text>
       )}
 
@@ -359,7 +368,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   reviewContainer: {
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#F7F5FB',
     padding: 16,
     borderRadius: 8,
     marginBottom: 12,

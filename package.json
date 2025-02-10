@@ -40,7 +40,8 @@
     "react-native-safe-area-context": "^5.0.0",
     "react-native-screens": "^4.3.0",
     "react-native-swiper": "^1.6.0",
-    "react-redux": "^9.2.0"
+    "react-redux": "^9.2.0",
+    "expo-linear-gradient": "~14.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -13,6 +13,8 @@ import { uploadToSupabase } from "../../components/SupabaseImageUpload";
 import React, { useEffect, useRef, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { postDataUpload } from "../../components/PostDataUpload";
+import { LinearGradient } from "expo-linear-gradient";
+import GradientButton from "../../components/GradientButton";
 
 export default function AddPost() {
   const [imageUri, setImageUri] = useState([]);
@@ -64,7 +66,8 @@ export default function AddPost() {
   };
 
   return (
-    <View style={styles.container}>
+
+      <LinearGradient style={styles.container} colors={['#f6d5f7', '#fbe9d7']}>
      
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.postBox}>
@@ -78,12 +81,14 @@ export default function AddPost() {
             onChangeText={(text) => setTitle(text)}
             value={title}
           ></TextInput>
-          <TouchableOpacity
-            style={styles.button}
+          <GradientButton onPress={handleImageUpload} title="Upload"></GradientButton>
+          {/* <TouchableOpacity
+            
             onPress={handleImageUpload}
           >
-            <Text style={styles.buttonText}>Upload</Text>
-          </TouchableOpacity>
+            <LinearGradient colors={['#f6d5f7', '#fbe9d7']} style={styles.button}>
+            <Text style={styles.buttonText}>Upload</Text></LinearGradient>
+          </TouchableOpacity> */}
           <FlatList
             data={imageUri}
             renderItem={({ item }) => (
@@ -102,15 +107,11 @@ export default function AddPost() {
             onChangeText={(text) => setContent(text)}
             value={content}
           ></TextInput>
-          <TouchableOpacity
-            style={[styles.button, styles.submitButton]}
-            onPress={postData}
-          >
-            <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
+          <GradientButton onPress={postData} title="Submit"></GradientButton>
         </View>
       </ScrollView>
-    </View>
+      </LinearGradient>
+    
   );
 }
 
@@ -147,8 +148,8 @@ const styles = StyleSheet.create({
   postContent: {
     width: "100%",
     minHeight: 150,
-    borderWidth: 1,
-    borderColor: "#ddd",
+    borderWidth: 0.5,
+    //borderColor: "#AA74AC",
     borderRadius: 8,
     padding: 10,
     textAlignVertical: "top",
