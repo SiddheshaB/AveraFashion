@@ -3,10 +3,11 @@ import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
 const GradientButton = ({title, onPress}:any) => {
     return (
-        <TouchableOpacity onPress={onPress}>
-            <LinearGradient colors={['#F7F5FB', '#E5E5E5']} style={styles.button}>
+        <TouchableOpacity onPress={onPress} style={styles.button}>
+          {/*   <LinearGradient colors={['#F7F5FB', '#E5E5E5']} style={styles.button}>
                 <Text style={styles.buttonText}>{title}</Text>
-            </LinearGradient>
+            </LinearGradient> */}
+            <Text style={styles.buttonText}>{title}</Text>
         </TouchableOpacity>
     );
 }
@@ -18,6 +19,7 @@ const styles= StyleSheet.create({
         paddingHorizontal: 24,
         width: "100%",
         alignItems: "center",
+        backgroundColor:"#333",
     },
     buttonText: {
         color: '#fff',

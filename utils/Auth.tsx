@@ -34,22 +34,22 @@ export default function GoogleLogin() {
         showPlayServicesUpdateDialog: true,
       });
       const userInfo = await GoogleSignin.signIn();
-      if (userInfo.data.idToken) {
+      if (userInfo?.data?.idToken) {
         const { data, error } = await supabase.auth.signInWithIdToken({
           provider: "google",
           token: userInfo.data.idToken,
         });
         if (error) throw error;
         dispatch(setUserInfo(data));
-        dispatch(setActiveUser(true));
+        //dispatch(setActiveUser(true));
         router.replace("/(tabs)");
       }
-    } catch (error) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+    } catch (error: any) {
+      if (error?.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log("User cancelled the login flow");
       } else if (error.code === statusCodes.IN_PROGRESS) {
         console.log("Operation is in progress already");
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+      } else if (error?.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         console.log("Play services not available or outdated");
       } else {
         console.log("Some other error happened:", error);

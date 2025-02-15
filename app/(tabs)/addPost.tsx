@@ -17,10 +17,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import GradientButton from "../../components/GradientButton";
 
 export default function AddPost() {
-  const [imageUri, setImageUri] = useState([]);
+  const [imageUri, setImageUri] = useState<any>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [title, setTitle] = useState(null);
-  const [content, setContent] = useState(null);
+  const [title, setTitle] = useState<any>(null);
+  const [content, setContent] = useState<any>(null);
 
   const handleImageUpload = async () => {
     try {
@@ -36,7 +36,7 @@ export default function AddPost() {
         allowsMultipleSelection: true,
         base64: true,
       });
-      console.log(JSON.stringify(result.assets[0].uri));
+      //console.log(JSON.stringify(result.assets[0].uri));
       if (!permissionResult.granted) {
         alert("Permission to access media library is required!");
         return;
@@ -49,7 +49,7 @@ export default function AddPost() {
         console.log("Image uri array: ", imageUri);
       }
     } catch (error) {
-      console.error("Error uploading:", error);
+      //console.error("Error uploading:", error);
     } finally {
       setIsLoading(false);
     }
@@ -66,10 +66,8 @@ export default function AddPost() {
   };
 
   return (
-
-      <LinearGradient style={styles.container} colors={['#f6d5f7', '#fbe9d7']}>
      
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+     <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.postBox}>
           <TextInput
             editable
@@ -94,7 +92,7 @@ export default function AddPost() {
             renderItem={({ item }) => (
               <Image source={{ uri: item }} style={{ width: 100, height: 100 }} />
             )}
-            numColumns={2}
+            numColumns={3}
             scrollEnabled={false}
           />
           <TextInput
@@ -109,8 +107,8 @@ export default function AddPost() {
           ></TextInput>
           <GradientButton onPress={postData} title="Submit"></GradientButton>
         </View>
-      </ScrollView>
-      </LinearGradient>
+     </ScrollView>
+
     
   );
 }
@@ -120,21 +118,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContainer: {
-    flexGrow: 1,
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 20,
+    paddingVertical: 90,
   },
   postBox: {
     borderRadius: 20,
     shadowColor: "grey",
     backgroundColor: "white",
-    width: 320,
+    width: '100%',
     padding: 20,
     alignItems: "center",
     justifyContent: "center",
     elevation: 5,
     gap: 15,
+    height: '100%',
+    flex:1,
   },
   postSummary: {
     width: "100%",
@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     textAlignVertical: "top",
+    marginTop: 100,
   },
   postContent: {
     width: "100%",
@@ -151,8 +152,9 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     //borderColor: "#AA74AC",
     borderRadius: 8,
-    padding: 10,
+    padding: 20,
     textAlignVertical: "top",
+    marginTop: 10,
   },
   button: {
     backgroundColor: "#f0f0f0",

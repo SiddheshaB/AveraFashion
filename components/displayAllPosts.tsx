@@ -174,6 +174,7 @@ export default function DisplayAllPosts() {
 
   return (
     <View style={styles.container}>
+  
       {/* Filter Toggle Buttons - Only shown when user is logged in */}
       {user && (
         <View style={styles.filterContainer}>
@@ -235,40 +236,43 @@ export default function DisplayAllPosts() {
             {/* Post Title */}
             <Text style={styles.postTitle}>{item.title}</Text>
 
-            {/* Image Swiper Section */}
-            <View style={styles.imageSection}>
-              <Swiper
-                style={{ height: '100%' }}
-                loop={false}
-                dotStyle={styles.dotStyle}
-                activeDotColor="black"
-                renderPagination={(index, total) => (
-                  <View style={styles.paginationContainer}>
-                    <Text style={styles.paginationText}>
-                      {index + 1}/{total}
-                    </Text>
-                  </View>
-                )}
-              >
-                {(JSON.parse(item.image_url)).map((uri: string, index: number) => (
-                  <TouchableOpacity 
-                    key={index} 
-                    style={{alignItems: "center", justifyContent: "center"}}
-                    onPress={() => router.push({
-                      pathname: "/post",  // Navigate to post details screen
-                      params: { post: JSON.stringify(item) }  // Pass post data as params
-                    })}
-                  >
-                    <Image
-                      source={{ uri }}
-                      style={styles.image}
-                    />
-                  </TouchableOpacity>
-                ))}
-              </Swiper>
-            </View>
+            {/* Image Swiper Section - Only show if there are images */}
+            {JSON.parse(item.image_url).length > 0 && (
+              <View style={styles.imageSection}>
+                <Swiper
+                  style={{ height: '100%' }}
+                  loop={false}
+                  dotStyle={styles.dotStyle}
+                  activeDotStyle={styles.activeDot}
+                  renderPagination={(index, total) => (
+                    <View style={styles.paginationContainer}>
+                      <Text style={styles.paginationText}>
+                        {index + 1}/{total}
+                      </Text>
+                    </View>
+                  )}
+                >
+                  {(JSON.parse(item.image_url)).map((uri: string, index: number) => (
+                    <TouchableOpacity 
+                      key={index} 
+                      style={{alignItems: "center", justifyContent: "center"}}
+                      onPress={() => router.push({
+                        pathname: "/post",  // Navigate to post details screen
+                        params: { post: JSON.stringify(item) }  // Pass post data as params
+                      })}
+                    >
+                      <Image
+                        source={{ uri }}
+                        style={styles.image}
+                      />
+                    </TouchableOpacity>
+                  ))}
+                </Swiper>
+              </View>
+            )}
 
             {/* Review Stats Section */}
+    
             <View style={styles.reviewInfo}>
               <View style={styles.ratingContainer}>
                 <FontAwesome name="star" size={16} color="#FFD700" />
@@ -286,6 +290,7 @@ export default function DisplayAllPosts() {
         keyExtractor={(item) => item.post_id}
         contentContainerStyle={styles.listContent}
         onEndReachedThreshold={0.5}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </View>
   );
@@ -296,16 +301,18 @@ const styles = StyleSheet.create({
   // Container styles
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F8F8F8',
   },
   // Filter section styles
   filterContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    paddingVertical: 8,
-    backgroundColor: "white",
+    paddingVertical: 26,
+    backgroundColor: "#ffffff",
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
+    //borderRadius: 30,
+    height: 90,
   },
   filterButton: {
     paddingVertical: 8,
@@ -328,7 +335,7 @@ const styles = StyleSheet.create({
   },
   // Post card styles
   postCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
     marginBottom: 12,
   },
   // User info section styles
@@ -344,15 +351,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatar: {
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     borderRadius: 20,
     marginRight: 12,
   },
   userName: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '500',
     color: '#333',
+    textTransform: 'lowercase'
   },
   // Post content styles
   postTitle: {
@@ -367,9 +375,10 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').height * 0.5,
   },
   image: {
-    width: '100%',
+    width: '90%',
     height: '100%',
     resizeMode: 'cover',
+    borderRadius: 10,
   },
   // Review section styles
   reviewInfo: {
@@ -378,7 +387,7 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: 'f0f0f0',
   },
   ratingContainer: {
     flexDirection: 'row',
@@ -402,7 +411,7 @@ const styles = StyleSheet.create({
   paginationContainer: {
     position: 'absolute',
     top: 10,
-    right: 10,
+    right: 25,
     backgroundColor: 'rgba(0,0,0,0.6)',
     padding: 8,
     borderRadius: 15,
@@ -412,20 +421,38 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   dotStyle: {
-    backgroundColor: '#D9D9D9',
+    backgroundColor: 'red',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginLeft: 30,
+    marginRight: 30,
+    marginTop: 3,
+    marginBottom: 3,
+  },
+  activeDot: {
+    backgroundColor: '#000',
     width: 8,
     height: 8,
     borderRadius: 4,
     marginLeft: 3,
     marginRight: 3,
+    marginTop: 3,
+    marginBottom: 3,
   },
   // FlatList styles
   flatList: {
     flex: 1,
     backgroundColor: "white",
+    zIndex: -10,
   },
   listContent: {
     justifyContent: "center",
-    gap: 20,
+    gap: 0,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: "#f0f0f0",
+  
   },
 });

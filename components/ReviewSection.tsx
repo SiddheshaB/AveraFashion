@@ -308,7 +308,7 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
                   onPress={() => deleteReview(item.id)}
                   style={styles.deleteButton}
                 >
-                  <FontAwesome name="trash-o" size={18} color="#ff4444" />
+                  <FontAwesome name="trash-o" size={18} color="#e0e0e0" />
                 </TouchableOpacity>
               )}
             </View>
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
     padding: 16,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#F8F8F8',
     borderRadius: 8,
   },
   averageRatingText: {
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   reviewContainer: {
-    backgroundColor: '#F7F5FB',
+    backgroundColor: '#F8F8F8',
     padding: 16,
     borderRadius: 8,
     marginBottom: 12,

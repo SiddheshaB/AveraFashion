@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../utils/supabase";
 import { setActiveUser, setUserInfo } from "../../store/users";
 export default function TabLayout() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -49,16 +49,39 @@ export default function TabLayout() {
     };
   }, []);
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, }}>
       {!user ? (
         <Login></Login> //if user is not  signed-in, Sign-in button will appear
       ) : (
         // if user is already signed-in, Homescreen and other tabs will appear
         <Tabs
           screenOptions={{
-            tabBarActiveTintColor: "blue",
+            tabBarActiveTintColor: "black",
             tabBarShowLabel: false,
             headerTitle: "StyleMe",
+            headerShown: false,
+            tabBarStyle: {
+              position: 'absolute',
+              bottom: 20,
+              left: '15%',
+              right: '15%',
+              elevation: 4,
+              backgroundColor: 'white',
+              marginHorizontal: 16,
+              borderRadius: 15,
+              height: 55,
+              shadowColor: '#000',
+              shadowOffset: {
+                width: 0,
+                height: 9,
+              },
+              shadowOpacity: 0.3,
+              shadowRadius: 4,
+              alignItems: 'center',
+              justifyContent: 'center',
+              alignContent: 'center',
+              paddingTop: 9,
+            },
           }}
         >
           <Tabs.Screen

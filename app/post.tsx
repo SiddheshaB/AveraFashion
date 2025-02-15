@@ -27,7 +27,32 @@ export default function PostScreen() {
         type: 'content',
         content: (
           <>
+            {/* Images Section - Shows image carousel */}
+            {images.length > 0 && (
+              <View style={styles.imageSectionContainer}>
+                <View style={styles.imageSection}>
+                  <Swiper 
+                    style={styles.swiper}
+                    dotStyle={styles.dot}
+                    activeDotStyle={styles.activeDot}
+                    loop={false}
+                    showsButtons={false}
+                  >
+                    {images.map((uri: string, index: number) => (
+                      <View key={index} style={styles.slide}>
+                        <Image
+                          source={{ uri }}
+                          style={styles.image}
+                          resizeMode="cover"
+                        />
+                      </View>
+                    ))}
+                  </Swiper>
+                </View>
+              </View>
+            )}
             {/* User Profile Section - Shows avatar and name */}
+            <View style={styles.profileSectionContainer}>
             <View style={styles.profileSection}>
               <Image 
                 source={{ uri: postData.profiles.avatar_url }} 
@@ -35,37 +60,14 @@ export default function PostScreen() {
               />
               <Text style={styles.fullName}>{postData.profiles.full_name}</Text>
             </View>
-
-            {/* Title Section - Shows post title */}
+               {/* Title Section - Shows post title */}
             <View style={styles.titleSection}>
               <Text style={styles.title}>{postData.title}</Text>
             </View>
-
-            {/* Images Section - Shows image carousel */}
-            <View style={styles.imageSection}>
-              <Swiper 
-                style={styles.swiper}
-                dotStyle={styles.dot}
-                activeDotStyle={styles.activeDot}
-                loop={false}
-                showsButtons={false}
-              >
-                {images.map((uri: string, index: number) => (
-                  <View key={index} style={styles.slide}>
-                    <Image
-                      source={{ uri }}
-                      style={styles.image}
-                      resizeMode="cover"
-                    />
-                  </View>
-                ))}
-              </Swiper>
-            </View>
-
             {/* Content Section - Shows post content */}
             <View style={styles.contentSection}>
               <Text style={styles.content}>{postData.content}</Text>
-            </View>
+            </View></View>
 
             {/* Reviews Section */}
             <ReviewSection 
@@ -106,8 +108,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+  
   },
   avatar: {
     width: 40,
@@ -121,13 +122,19 @@ const styles = StyleSheet.create({
   },
   // Title section styles
   titleSection: {
-    padding: 16,
+    padding: 10,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
   },
   // Image section styles
+  imageSectionContainer: {
+    overflow: 'hidden',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    zIndex: 5,
+  },
   imageSection: {
     height: screenHeight * 0.5,
   },
@@ -166,11 +173,18 @@ const styles = StyleSheet.create({
   // Content section styles
   contentSection: {
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
   },
   content: {
     fontSize: 16,
     lineHeight: 24,
   },
+  //Profile Section Styles
+  profileSectionContainer: {
+    backgroundColor: '#F8F8F8',
+    marginTop: -30,
+    paddingLeft: 5,
+    paddingTop:20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+  }
 });

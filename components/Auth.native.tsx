@@ -17,7 +17,7 @@ AppState.addEventListener("change", (state) => {
   }
 });
 export default function GoogleLogin() {
-  const [user, setUser] = useState(null);
+const [user, setUser] = useState<any>();
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
 
@@ -42,7 +42,7 @@ export default function GoogleLogin() {
     // Listen to auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        if (session) {
+        if (session?.user) {
           setUser(session.user); // User signed in
         } else {
           setUser(null); // User signed out
@@ -77,13 +77,13 @@ export default function GoogleLogin() {
                 showPlayServicesUpdateDialog: true,
               });
               const userInfo = await GoogleSignin.signIn();
-              if (userInfo.data.idToken) {
+              if (userInfo?.data?.idToken) {
                 const { data, error } = await supabase.auth.signInWithIdToken({
                   provider: "google",
                   token: userInfo.data.idToken,
                 });
                 console.log("User logged in successfully.");
-                dispatch(setActiveUser(true)); // set Status for loogedIn as True
+                //dispatch(setActiveUser(true)); // set Status for loogedIn as True
               } else {
                 throw new Error("no ID token present!");
               }
