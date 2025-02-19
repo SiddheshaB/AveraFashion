@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
-    paddingHorizontal: 16,
+    paddingHorizontal: 19,
     paddingBottom: 12,
   },
   // Image section styles
@@ -393,6 +393,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+    paddingHorizontal: 10,
   },
   ratingText: {
     fontSize: 16,
