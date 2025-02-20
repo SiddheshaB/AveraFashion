@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "../utils/supabase";
 import React from "react";
-import { FlatList, Text, View, Image, TouchableOpacity, StyleSheet, Dimensions, RefreshControl, Alert } from "react-native";
+import { FlatList, Text, View, Image, TouchableOpacity, StyleSheet, Dimensions, RefreshControl, Alert, ActivityIndicator } from "react-native";
 import Swiper from "react-native-swiper";
 import { useSelector } from "react-redux";
 import { useRouter } from 'expo-router';
@@ -42,6 +42,7 @@ export default function DisplayAllPosts() {
   const [postdata, setPostData] = useState<Post[]>([]); // Store posts data
   const [refreshing, setRefreshing] = useState(false); // Pull-to-refresh state
   const [selectedFilter, setSelectedFilter] = useState("all"); // Filter toggle state
+  const [isLoading, setIsLoading] = useState(true); // Loading state
   
   // Get user info from Redux store
   const users = useSelector((state: any) => state.users);
@@ -52,6 +53,7 @@ export default function DisplayAllPosts() {
    * Includes post details, user profiles, and review statistics
    */
   const fetchData = async () => {
+    setIsLoading(true);
     try {
       // First, get all posts with their basic info
       const { data: tableData, error } = await supabase
@@ -116,6 +118,8 @@ export default function DisplayAllPosts() {
     } catch (error) {
       console.error("Error retrieving data from Supabase:", error);
       setPostData([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -206,92 +210,100 @@ export default function DisplayAllPosts() {
       )}
 
       {/* Posts List with pull-to-refresh */}
-      <FlatList
-        data={filteredPosts}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        renderItem={({ item }) => (
-          <View style={styles.postCard}>
-            {/* User Info Section */}
-            <View style={styles.userInfo}>
-              <View style={styles.userProfile}>
-                <Image
-                  source={{ uri: item.profiles.avatar_url }}
-                  style={styles.avatar}
-                />
-                <Text style={styles.userName}>{item.profiles.full_name}</Text>
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#333" />
+        </View>
+      ) : (
+        <FlatList
+          data={filteredPosts}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          renderItem={({ item }) => (
+            <View style={styles.postCard}>
+              {/* User Info Section */}
+              <View style={styles.userInfo}>
+                <View style={styles.userProfile}>
+                  <Image
+                    source={{ uri: item.profiles.avatar_url }}
+                    style={styles.avatar}
+                  />
+                  <Text style={styles.userName}>{item.profiles.full_name}</Text>
+                </View>
+                {/* Delete Icon - Only visible in My Posts and if user is the post owner */}
+                {selectedFilter === "my" && user?.user?.id === item.user_id && (
+                  <TouchableOpacity 
+                    style={styles.deleteButton}
+                    onPress={() => handleDeletePost(item.post_id)}
+                  >
+                    <FontAwesome name="trash" size={20} color="#e0e0e0" />
+                  </TouchableOpacity>
+                )}
               </View>
-              {/* Delete Icon - Only visible in My Posts and if user is the post owner */}
-              {selectedFilter === "my" && user?.user?.id === item.user_id && (
-                <TouchableOpacity 
-                  style={styles.deleteButton}
-                  onPress={() => handleDeletePost(item.post_id)}
-                >
-                  <FontAwesome name="trash" size={20} color="#e0e0e0" />
-                </TouchableOpacity>
+
+              {/* Post Title */}
+              <Text style={styles.postTitle}>{item.title}</Text>
+
+              {/* Image Swiper Section - Only show if there are images */}
+              {JSON.parse(item.image_url).length > 0 && (
+                <View style={styles.imageSection}>
+                  <Swiper
+                    //style={{ height: '100%' }}
+                    loop={false}
+                    dotStyle={styles.dotStyle}
+                    activeDotStyle={styles.activeDot}
+                    showsButtons={false}
+                    renderPagination={(index, total) => (
+                      <View style={styles.paginationContainer}>
+                        <Text style={styles.paginationText}>
+                          {index + 1}/{total}
+                        </Text>
+                      </View>
+                    )}
+                  >
+                    {(JSON.parse(item.image_url)).map((uri: string, index: number) => (
+                      <TouchableOpacity 
+                        key={index} 
+                        style={{alignItems: "center", justifyContent: "center"}}
+                        onPress={() => router.push({
+                          pathname: "/post",  // Navigate to post details screen
+                          params: { post: JSON.stringify(item) }  // Pass post data as params
+                        })}
+                      >
+                        <Image
+                          source={{ uri }}
+                          style={styles.image}
+                          
+                        />
+                      </TouchableOpacity>
+                    ))}
+                  </Swiper>
+                </View>
               )}
-            </View>
 
-            {/* Post Title */}
-            <Text style={styles.postTitle}>{item.title}</Text>
-
-            {/* Image Swiper Section - Only show if there are images */}
-            {JSON.parse(item.image_url).length > 0 && (
-              <View style={styles.imageSection}>
-                <Swiper
-                  style={{ height: '100%' }}
-                  loop={false}
-                  dotStyle={styles.dotStyle}
-                  activeDotStyle={styles.activeDot}
-                  renderPagination={(index, total) => (
-                    <View style={styles.paginationContainer}>
-                      <Text style={styles.paginationText}>
-                        {index + 1}/{total}
-                      </Text>
-                    </View>
-                  )}
-                >
-                  {(JSON.parse(item.image_url)).map((uri: string, index: number) => (
-                    <TouchableOpacity 
-                      key={index} 
-                      style={{alignItems: "center", justifyContent: "center"}}
-                      onPress={() => router.push({
-                        pathname: "/post",  // Navigate to post details screen
-                        params: { post: JSON.stringify(item) }  // Pass post data as params
-                      })}
-                    >
-                      <Image
-                        source={{ uri }}
-                        style={styles.image}
-                      />
-                    </TouchableOpacity>
-                  ))}
-                </Swiper>
-              </View>
-            )}
-
-            {/* Review Stats Section */}
-    
-            <View style={styles.reviewInfo}>
-              <View style={styles.ratingContainer}>
-                <FontAwesome name="star" size={16} color="#FFD700" />
-                <Text style={styles.ratingText}>
-                  {(item.averageRating || 0).toFixed(1)}
+              {/* Review Stats Section */}
+      
+              <View style={styles.reviewInfo}>
+                <View style={styles.ratingContainer}>
+                  <FontAwesome name="star" size={16} color="#FFD700" />
+                  <Text style={styles.ratingText}>
+                    {(item.averageRating || 0).toFixed(1)}
+                  </Text>
+                </View>
+                <Text style={styles.reviewCount}>
+                  ({(item.reviewCount || 0)} {(item.reviewCount || 0) === 1 ? 'review' : 'reviews'})
                 </Text>
               </View>
-              <Text style={styles.reviewCount}>
-                ({(item.reviewCount || 0)} {(item.reviewCount || 0) === 1 ? 'review' : 'reviews'})
-              </Text>
             </View>
-          </View>
-        )}
-        style={styles.flatList}
-        keyExtractor={(item) => item.post_id}
-        contentContainerStyle={styles.listContent}
-        onEndReachedThreshold={0.5}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      />
+          )}
+          style={styles.flatList}
+          keyExtractor={(item) => item.post_id}
+          contentContainerStyle={styles.listContent}
+          onEndReachedThreshold={0.5}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
+      )}
     </View>
   );
 }
@@ -422,12 +434,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   dotStyle: {
-    backgroundColor: 'red',
+    backgroundColor: 'rgba(0,0,0,.2)',
     width: 8,
     height: 8,
     borderRadius: 4,
-    marginLeft: 30,
-    marginRight: 30,
+    marginLeft: 3,
+    marginRight: 3,
     marginTop: 3,
     marginBottom: 3,
   },
@@ -455,5 +467,10 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "#f0f0f0",
   
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

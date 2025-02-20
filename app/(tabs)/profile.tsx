@@ -9,6 +9,10 @@ export default function Profile() {
   const handleLogout = () => {
     signOut(dispatch);
   };
+  const formatDate=(timestamp:string)=>{
+    const date=new Date(timestamp);
+    return date.toISOString().split('T')[0];
+  }
   return (
     <View style={styles.container}>
       <View style={styles.profileCard}>
@@ -17,6 +21,7 @@ export default function Profile() {
           <Text style={styles.name}>{users.user.user_metadata.full_name}</Text>
         </View>
         <Text style={styles.email}>{users.user.email}</Text>
+        <Text style={styles.date}>Member since: {formatDate(users.user.created_at)}</Text>
         <TouchableOpacity onPress={handleLogout}>
           <Text style={styles.signOutText}>Sign Out</Text>
         </TouchableOpacity>
@@ -63,4 +68,8 @@ const styles = StyleSheet.create({
     color: "#666",
     textDecorationLine: "underline",
   },
+  date:{
+    fontSize: 10,
+    color: "#666",
+  }
 });

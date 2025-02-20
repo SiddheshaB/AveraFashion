@@ -1,15 +1,38 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Tabs } from "expo-router";
 import { useDispatch } from "react-redux";
-import { View } from "react-native";
+import { View, Keyboard, Platform } from "react-native";
 import Login from "../sign_in";
 import { useEffect, useState } from "react";
 import { supabase } from "../../utils/supabase";
 import { setActiveUser, setUserInfo } from "../../store/users";
+
 export default function TabLayout() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const keyboardWillShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      }
+    );
+    const keyboardWillHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardWillShowListener.remove();
+      keyboardWillHideListener.remove();
+    };
+  }, []);
+
   useEffect(() => {
     // Check if the user is already signed in
     const restoreSession = async () => {
@@ -61,6 +84,7 @@ export default function TabLayout() {
             headerTitle: "StyleMe",
             headerShown: false,
             tabBarStyle: {
+              display: isKeyboardVisible ? 'none' : 'flex',
               position: 'absolute',
               bottom: 20,
               left: '15%',

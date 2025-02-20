@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     fontStyle: "italic",
-    color:"#e8e8e8"
+    color:"#333"
   },
   postBox: {
     width: "100%",
