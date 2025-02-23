@@ -180,11 +180,13 @@ const styles = StyleSheet.create({
   },
   //Profile Section Styles
   profileSectionContainer: {
-    backgroundColor: '#F8F8F8',
+    backgroundColor: '#faf4fb',
     marginTop: -30,
     paddingLeft: 5,
     paddingTop:20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
+    //borderWidth: 1,
+    //borderColor: "#724C9D",
   }
 });

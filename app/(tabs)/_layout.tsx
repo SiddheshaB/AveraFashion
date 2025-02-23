@@ -79,7 +79,8 @@ export default function TabLayout() {
         // if user is already signed-in, Homescreen and other tabs will appear
         <Tabs
           screenOptions={{
-            tabBarActiveTintColor: "black",
+            tabBarActiveTintColor: "#724C9D",
+            tabBarInactiveTintColor:"#aaa2d8",
             tabBarShowLabel: false,
             headerTitle: "StyleMe",
             headerShown: false,
