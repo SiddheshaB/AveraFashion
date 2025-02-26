@@ -356,8 +356,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
     padding: 16,
-    backgroundColor: '#F8F8F8',
+    //backgroundColor: '#FBFAF4',
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#E8E2C0",
   },
   averageRatingText: {
     fontSize: 16,
@@ -368,10 +370,12 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   reviewContainer: {
-    backgroundColor: '#F8F8F8',
+   // backgroundColor: '#F5FBF4',
     padding: 16,
     borderRadius: 8,
     marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#C0E8E2",
   },
   reviewHeader: {
     flexDirection: 'row',

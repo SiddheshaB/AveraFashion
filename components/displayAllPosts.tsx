@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "../utils/supabase";
 import React from "react";
-import { FlatList, Text, View, Image, TouchableOpacity, StyleSheet, Dimensions, RefreshControl, Alert, ActivityIndicator } from "react-native";
+import { FlatList, Text, View, Image, TouchableOpacity, StyleSheet, Dimensions, RefreshControl, Alert, ActivityIndicator, Modal } from "react-native";
 import Swiper from "react-native-swiper";
 import { useSelector } from "react-redux";
 import { useRouter } from 'expo-router';
@@ -43,6 +43,7 @@ export default function DisplayAllPosts() {
   const [refreshing, setRefreshing] = useState(false); // Pull-to-refresh state
   const [selectedFilter, setSelectedFilter] = useState("all"); // Filter toggle state
   const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   
   // Get user info from Redux store
   const users = useSelector((state: any) => state.users);
@@ -178,38 +179,67 @@ export default function DisplayAllPosts() {
 
   return (
     <View style={styles.container}>
-  
-      {/* Filter Toggle Buttons - Only shown when user is logged in */}
-      {user && (
-        <View style={styles.filterContainer}>
+      {/* Header Section */}
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerTitle}>Feed</Text>
+        {user && (
           <TouchableOpacity 
-            style={[
-              styles.filterButton,
-              selectedFilter === "all" && styles.filterButtonActive
-            ]}
-            onPress={() => setSelectedFilter("all")}
+            style={styles.menuButton}
+            onPress={() => setIsDropdownVisible(true)}
           >
-            <Text style={[
-              styles.filterButtonText,
-              selectedFilter === "all" && styles.filterButtonTextActive
-            ]}>All Posts</Text>
+            <FontAwesome name="ellipsis-v" size={24} color="#333" />
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={[
-              styles.filterButton,
-              selectedFilter === "my" && styles.filterButtonActive
-            ]}
-            onPress={() => setSelectedFilter("my")}
-          >
-            <Text style={[
-              styles.filterButtonText,
-              selectedFilter === "my" && styles.filterButtonTextActive
-            ]}>My Posts</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+        )}
+      </View>
 
-      {/* Posts List with pull-to-refresh */}
+      {/* Filter Dropdown Modal */}
+      <Modal
+        visible={isDropdownVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsDropdownVisible(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setIsDropdownVisible(false)}
+        >
+          <View style={styles.dropdownContainer}>
+            <TouchableOpacity 
+              style={[
+                styles.dropdownItem,
+                selectedFilter === "all" && styles.dropdownItemActive
+              ]}
+              onPress={() => {
+                setSelectedFilter("all");
+                setIsDropdownVisible(false);
+              }}
+            >
+              <Text style={[
+                styles.dropdownText,
+                selectedFilter === "all" && styles.dropdownTextActive
+              ]}>All Posts</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[
+                styles.dropdownItem,
+                selectedFilter === "my" && styles.dropdownItemActive
+              ]}
+              onPress={() => {
+                setSelectedFilter("my");
+                setIsDropdownVisible(false);
+              }}
+            >
+              <Text style={[
+                styles.dropdownText,
+                selectedFilter === "my" && styles.dropdownTextActive
+              ]}>My Posts</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Posts List */}
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#333" />
@@ -301,7 +331,7 @@ export default function DisplayAllPosts() {
           keyExtractor={(item) => item.post_id}
           contentContainerStyle={styles.listContent}
           onEndReachedThreshold={0.5}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
+         // ItemSeparatorComponent={() => <View style={styles.separator} />}
         />
       )}
     </View>
@@ -315,40 +345,71 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F8F8',
   },
-  // Filter section styles
-  filterContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    paddingVertical: 26,
-    backgroundColor: "#ffffff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-    //borderRadius: 30,
-    height: 90,
-  },
-  filterButton: {
-    paddingVertical: 8,
+  // Header styles
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 16,
-    borderRadius: 20,
-    marginHorizontal: 8,
-    backgroundColor: "#f0f0f0",
+    paddingVertical: 16,
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
-  filterButtonActive: {
-    backgroundColor: "#333",
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#333',
+    marginTop: 14
   },
-  filterButtonText: {
-    color: "#666",
-    fontSize: 14,
-    fontWeight: "500",
+  menuButton: {
+    padding: 8,
+    marginTop: 14
   },
-  filterButtonTextActive: {
-    color: "white",
-    fontWeight: "500",
+  // Filter section styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  dropdownContainer: {
+    position: 'absolute',
+    top: 60,
+    right: 16,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    minWidth: 150,
+  },
+  dropdownItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  dropdownItemActive: {
+    backgroundColor: '#f0f0f0',
+  },
+  dropdownText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  dropdownTextActive: {
+    color: '#724C9D',
+    fontWeight: '500',
   },
   // Post card styles
   postCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: 'red',
     marginBottom: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    borderRadius: 12,
+    width: 350,
   },
   // User info section styles
   userInfo: {
@@ -384,7 +445,7 @@ const styles = StyleSheet.create({
   },
   // Image section styles
   imageSection: {
-    height: Dimensions.get('window').height * 0.5,
+    height: Dimensions.get('window').height * 0.6,
   },
   image: {
     width: '90%',
@@ -463,11 +524,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 0,
   },
-  separator: {
+  /* separator: {
     height: 1,
     backgroundColor: "#f0f0f0",
   
-  },
+  }, */
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
