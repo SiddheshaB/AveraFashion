@@ -3,11 +3,44 @@ import { useSelector } from "react-redux";
 import signOut from "../../utils/signOut";
 import { useDispatch } from "react-redux";
 import { FontAwesome } from '@expo/vector-icons';
+import { useState, useEffect } from 'react';
+import { supabase } from "../../utils/supabase";
 
 export default function Profile() {
   const users = useSelector((state: any) => state.users[0].userInfo);
   const dispatch = useDispatch();
+  const [postCount, setPostCount] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
   
+  useEffect(() => {
+    fetchUserStats();
+  }, []);
+
+  const fetchUserStats = async () => {
+    try {
+      // Fetch post count
+      const { count: posts, error: postsError } = await supabase
+        .from('posts')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', users.user.id);
+
+      if (postsError) throw postsError;
+      setPostCount(posts || 0);
+
+      // Fetch review count
+      const { count: reviews, error: reviewsError } = await supabase
+        .from('reviews')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', users.user.id);
+
+      if (reviewsError) throw reviewsError;
+      setReviewCount(reviews || 0);
+
+    } catch (error) {
+      console.error('Error fetching user stats:', error);
+    }
+  };
+
   const handleLogout = () => {
     signOut(dispatch);
   };
@@ -36,12 +69,12 @@ export default function Profile() {
 
       <View style={styles.statsSection}>
         <View style={styles.statItem}>
-          <Text style={styles.statNumber}>0</Text>
+          <Text style={styles.statNumber}>{postCount}</Text>
           <Text style={styles.statLabel}>Posts</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={styles.statNumber}>0</Text>
+          <Text style={styles.statNumber}>{reviewCount}</Text>
           <Text style={styles.statLabel}>Reviews</Text>
         </View>
       </View>
