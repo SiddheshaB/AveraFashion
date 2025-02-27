@@ -187,7 +187,7 @@ export default function DisplayAllPosts() {
             style={styles.menuButton}
             onPress={() => setIsDropdownVisible(true)}
           >
-            <FontAwesome name="ellipsis-v" size={24} color="#333" />
+            <FontAwesome name="sliders" size={18} color="#666" />
           </TouchableOpacity>
         )}
       </View>
@@ -252,15 +252,73 @@ export default function DisplayAllPosts() {
           }
           renderItem={({ item }) => (
             <View style={styles.postCard}>
-              {/* User Info Section */}
-              <View style={styles.userInfo}>
-                <View style={styles.userProfile}>
+              {/* Image Swiper Section - Only show if there are images */}
+              {JSON.parse(item.image_url).length > 0 && (
+                <View style={styles.imageSection}>
+                  <Swiper
+                    loop={false}
+                    dotStyle={styles.dotStyle}
+                    activeDotStyle={styles.activeDot}
+                    showsButtons={false}
+                  >
+                    {(JSON.parse(item.image_url)).map((uri: string, index: number) => (
+                      <TouchableOpacity 
+                        key={index} 
+                        style={styles.imageContainer}
+                        onPress={() => router.push({
+                          pathname: "/post",
+                          params: { post: JSON.stringify(item) }
+                        })}
+                      >
+                        <Image
+                          source={{ uri }}
+                          style={styles.image}
+                        />
+                      </TouchableOpacity>
+                    ))}
+                  </Swiper>
+                </View>
+              )}
+
+              {/* Profile and Review Section */}
+              <View style={styles.bottomSection}>
+                <View style={styles.userInfo}>
                   <Image
                     source={{ uri: item.profiles.avatar_url }}
                     style={styles.avatar}
                   />
-                  <Text style={styles.userName}>{item.profiles.full_name}</Text>
+                  <View style={styles.userDetails}>
+                    <Text style={styles.userName}>{item.profiles.full_name}</Text>
+                    <Text style={styles.userRole}>Style Curator</Text>
+                  </View>
                 </View>
+
+                <View style={styles.statsContainer}>
+                  {item.reviewCount > 0 ? (
+                    <>
+                      <View style={styles.stat}>
+                        <FontAwesome name="star" size={16} color="#FFD700" />
+                        <Text style={styles.statText}>{item.averageRating.toFixed(1)}</Text>
+                      </View>
+                      <View style={styles.stat}>
+                        <FontAwesome name="comment" size={16} color="#666" />
+                        <Text style={styles.statText}>{item.reviewCount}</Text>
+                      </View>
+                    </>
+                  ) : (
+                    <TouchableOpacity 
+                      style={styles.reviewPrompt}
+                      onPress={() => router.push({
+                        pathname: "/post",
+                        params: { post: JSON.stringify(item) }
+                      })}
+                    >
+                      <FontAwesome name="star-o" size={16} color="#666" />
+                      <Text style={styles.promptText}>Be the first to review!</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+
                 {/* Delete Icon - Only visible in My Posts and if user is the post owner */}
                 {selectedFilter === "my" && user?.user?.id === item.user_id && (
                   <TouchableOpacity 
@@ -271,67 +329,12 @@ export default function DisplayAllPosts() {
                   </TouchableOpacity>
                 )}
               </View>
-
-              {/* Post Title */}
-              <Text style={styles.postTitle}>{item.title}</Text>
-
-              {/* Image Swiper Section - Only show if there are images */}
-              {JSON.parse(item.image_url).length > 0 && (
-                <View style={styles.imageSection}>
-                  <Swiper
-                    //style={{ height: '100%' }}
-                    loop={false}
-                    dotStyle={styles.dotStyle}
-                    activeDotStyle={styles.activeDot}
-                    showsButtons={false}
-                    renderPagination={(index, total) => (
-                      <View style={styles.paginationContainer}>
-                        <Text style={styles.paginationText}>
-                          {index + 1}/{total}
-                        </Text>
-                      </View>
-                    )}
-                  >
-                    {(JSON.parse(item.image_url)).map((uri: string, index: number) => (
-                      <TouchableOpacity 
-                        key={index} 
-                        style={{alignItems: "center", justifyContent: "center"}}
-                        onPress={() => router.push({
-                          pathname: "/post",  // Navigate to post details screen
-                          params: { post: JSON.stringify(item) }  // Pass post data as params
-                        })}
-                      >
-                        <Image
-                          source={{ uri }}
-                          style={styles.image}
-                          
-                        />
-                      </TouchableOpacity>
-                    ))}
-                  </Swiper>
-                </View>
-              )}
-
-              {/* Review Stats Section */}
-      
-              <View style={styles.reviewInfo}>
-                <View style={styles.ratingContainer}>
-                  <FontAwesome name="star" size={16} color="#FFD700" />
-                  <Text style={styles.ratingText}>
-                    {(item.averageRating || 0).toFixed(1)}
-                  </Text>
-                </View>
-                <Text style={styles.reviewCount}>
-                  ({(item.reviewCount || 0)} {(item.reviewCount || 0) === 1 ? 'review' : 'reviews'})
-                </Text>
-              </View>
             </View>
           )}
+          contentContainerStyle={styles.feedContainer}
           style={styles.flatList}
           keyExtractor={(item) => item.post_id}
-          contentContainerStyle={styles.listContent}
           onEndReachedThreshold={0.5}
-         // ItemSeparatorComponent={() => <View style={styles.separator} />}
         />
       )}
     </View>
@@ -343,7 +346,7 @@ const styles = StyleSheet.create({
   // Container styles
   container: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: "#f8f8f8",
   },
   // Header styles
   headerContainer: {
@@ -351,20 +354,20 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 12,
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: '600',
     color: '#333',
-    marginTop: 14
   },
   menuButton: {
     padding: 8,
-    marginTop: 14
+    borderRadius: 8,
+    backgroundColor: '#f8f8f8',
   },
   // Filter section styles
   modalOverlay: {
@@ -401,134 +404,122 @@ const styles = StyleSheet.create({
   },
   // Post card styles
   postCard: {
-    backgroundColor: 'red',
-    marginBottom: 12,
-    elevation: 2,
+    backgroundColor: 'white',
+    marginVertical: 8,
+    marginHorizontal: 12,
+    elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.1,
     shadowRadius: 4,
-    borderRadius: 12,
-    width: 350,
-  },
-  // User info section styles
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  userProfile: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 35,
-    height: 35,
-    borderRadius: 20,
-    marginRight: 12,
-  },
-  userName: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
-    textTransform: 'lowercase'
-  },
-  // Post content styles
-  postTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    paddingHorizontal: 19,
-    paddingBottom: 12,
+    borderRadius: 16,
+    width: Dimensions.get('window').width - 24,
+    overflow: 'hidden',
   },
   // Image section styles
   imageSection: {
-    height: Dimensions.get('window').height * 0.6,
+    height: Dimensions.get('window').height * 0.5,
+    backgroundColor: '#f8f8f8',
+  },
+  imageContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   image: {
-    width: '90%',
+    width: '100%',
     height: '100%',
     resizeMode: 'cover',
-    borderRadius: 10,
   },
-  // Review section styles
-  reviewInfo: {
+  // Profile and Review Section
+  bottomSection: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: 'f0f0f0',
+    flex: 1,
   },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 10,
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
+    backgroundColor: '#f0f0f0',
   },
-  ratingText: {
-    fontSize: 16,
+  userDetails: {
+    justifyContent: 'center',
+  },
+  userName: {
+    fontSize: 15,
     fontWeight: '600',
     color: '#333',
+    marginBottom: 2,
   },
-  reviewCount: {
-    fontSize: 14,
+  userRole: {
+    fontSize: 13,
     color: '#666',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  stat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statText: {
+    fontSize: 14,
+    color: '#333',
+    marginLeft: 6,
+    fontWeight: '500',
+  },
+  reviewPrompt: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f8f8',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  promptText: {
+    fontSize: 13,
+    color: '#666',
+    marginLeft: 6,
+    fontWeight: '500',
   },
   // Delete button styles
   deleteButton: {
     padding: 8,
   },
-  // Swiper pagination styles
-  paginationContainer: {
-    position: 'absolute',
-    top: 10,
-    right: 25,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    padding: 8,
-    borderRadius: 15,
-  },
-  paginationText: {
-    color: 'white',
-    fontSize: 12,
-  },
+  // Swiper styles
   dotStyle: {
-    backgroundColor: 'rgba(0,0,0,.2)',
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    backgroundColor: 'rgba(255,255,255,0.4)',
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     marginLeft: 3,
     marginRight: 3,
-    marginTop: 3,
-    marginBottom: 3,
   },
   activeDot: {
-    backgroundColor: '#000',
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginLeft: 3,
-    marginRight: 3,
-    marginTop: 3,
-    marginBottom: 3,
+    backgroundColor: '#fff',
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   // FlatList styles
   flatList: {
     flex: 1,
-    backgroundColor: "white",
-    zIndex: -10,
   },
-  listContent: {
-    justifyContent: "center",
-    gap: 0,
+  feedContainer: {
+    paddingVertical: 8,
   },
-  /* separator: {
-    height: 1,
-    backgroundColor: "#f0f0f0",
-  
-  }, */
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
