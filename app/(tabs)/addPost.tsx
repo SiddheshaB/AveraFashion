@@ -14,8 +14,8 @@ import React, { useEffect, useRef, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { postDataUpload } from "../../components/PostDataUpload";
 import GradientButton from "../../components/GradientButton";
-import Entypo from '@expo/vector-icons/Entypo';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { AntDesign } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import Swiper from 'react-native-swiper';
 
 const MAX_IMAGES = 3;
@@ -84,13 +84,20 @@ export default function AddPost() {
       contentContainerStyle={styles.scrollContainer}
       showsVerticalScrollIndicator={false}
     >
-      <Text style={styles.title}>Free AI Review</Text>
-      <Text style={styles.subtitle}>Get personalized style feedback from our AI stylist</Text>
+      <View style={styles.reviewBox}>
+        <View style={styles.iconBox}>
+          <MaterialIcons name="celebration" size={24} color="#6941C6" />
+        </View>
+        <View style={styles.reviewTextContainer}>
+          <Text style={styles.title}>Free AI Review</Text>
+          <Text style={styles.subtitle}>Get personalized style feedback from our AI stylist</Text>
+        </View>
+      </View>
       <View style={styles.postBox}>
         <Text style={styles.sectionTitle}>Select Occasion</Text>
         <TouchableOpacity style={styles.occasionSelector}>
           <Text style={styles.occasionText}>Choose an occasion</Text>
-          <Entypo name="chevron-down" size={24} color="#666" />
+          <AntDesign name="caretdown" size={24} color="#666" />
         </TouchableOpacity>
 
         <Text style={styles.sectionTitle}>Upload Photo</Text>
@@ -100,7 +107,7 @@ export default function AddPost() {
             onPress={handleImageUpload}
           >
             <View style={styles.uploadIconContainer}>
-              <Entypo name="camera" size={32} color="#666" />
+              <AntDesign name="camera" size={32} color="#666" />
             </View>
             <Text style={styles.uploadText}>Click to upload your outfit photo</Text>
           </TouchableOpacity>
@@ -159,16 +166,35 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 16,
   },
+  reviewBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#F9F5FF',
+    borderRadius: 12,
+    marginBottom: 32,
+  },
+  iconBox: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  reviewTextContainer: {
+    flex: 1,
+  },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 18,
+    fontWeight: "600",
     color: "#6941C6",
-    marginBottom: 8,
+    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#666",
-    marginBottom: 32,
   },
   sectionTitle: {
     fontSize: 16,
