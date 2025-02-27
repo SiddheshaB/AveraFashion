@@ -66,6 +66,17 @@ export default function AddPost() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [dropdownLayout, setDropdownLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
+  /**
+   * Measures the position and dimensions of the dropdown button in the window.
+   * Uses the dropdownRef to access the button component and measureInWindow to get:
+   * - x: distance from left edge of window
+   * - y: distance from top edge of window
+   * - width: total width of the button
+   * - height: total height of the button
+   * 
+   * This information is used to position the dropdown menu exactly below the button
+   * when it opens.
+   */
   const measureDropdown = () => {
     if (dropdownRef.current) {
       dropdownRef.current.measureInWindow((x, y, width, height) => {
@@ -132,7 +143,7 @@ export default function AddPost() {
     console.log("supabase download img: ", supabaseDownloadURL);
     
     // Upload post data to database
-    postDataUpload(title, content, supabaseDownloadURL);
+    postDataUpload(title, content, supabaseDownloadURL, selectedOccasion);
     
     // Reset form after successful upload
     setTitle('');
@@ -315,6 +326,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingVertical: 20,
     paddingHorizontal: 16,
+    paddingBottom: 100, // Added extra padding at bottom to account for floating tab bar
   },
   reviewBox: {
     flexDirection: 'row',

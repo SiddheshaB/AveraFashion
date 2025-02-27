@@ -3,7 +3,8 @@ import { supabase } from "../utils/supabase";
 export const postDataUpload = async (
   title: any,
   content: any,
-  supabaseUrl: any
+  supabaseUrl: any,
+  occasion: string
 ) => {
   try {
     const { data, error } = await supabase
@@ -13,6 +14,7 @@ export const postDataUpload = async (
         image_url: supabaseUrl,
         user_id: (await supabase.auth.getSession()).data.session.user.id,
         content: content,
+        occasion: occasion,
       });
     console.log(data);
 
