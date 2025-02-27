@@ -84,63 +84,66 @@ export default function AddPost() {
       contentContainerStyle={styles.scrollContainer}
       showsVerticalScrollIndicator={false}
     >
-      <Text style={styles.title}>What's on your mind?</Text>
+      <Text style={styles.title}>Free AI Review</Text>
+      <Text style={styles.subtitle}>Get personalized style feedback from our AI stylist</Text>
       <View style={styles.postBox}>
+        <Text style={styles.sectionTitle}>Select Occasion</Text>
+        <TouchableOpacity style={styles.occasionSelector}>
+          <Text style={styles.occasionText}>Choose an occasion</Text>
+          <Entypo name="chevron-down" size={24} color="#666" />
+        </TouchableOpacity>
+
+        <Text style={styles.sectionTitle}>Upload Photo</Text>
+        {imageUri.length === 0 ? (
+          <TouchableOpacity 
+            style={styles.uploadContainer} 
+            onPress={handleImageUpload}
+          >
+            <View style={styles.uploadIconContainer}>
+              <Entypo name="camera" size={32} color="#666" />
+            </View>
+            <Text style={styles.uploadText}>Click to upload your outfit photo</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.imageContainer}>
+            <TouchableOpacity
+              style={styles.clearButton}
+              onPress={() => setImageUri([])}
+            >
+              <MaterialIcons name="clear" size={20} color="black" />            
+            </TouchableOpacity>
+            <Swiper
+              style={styles.swiper}
+              dotStyle={styles.dotStyle}
+              activeDotStyle={styles.activeDotStyle}
+              paginationStyle={styles.pagination}
+              showsButtons={false}
+              loop={false}
+            >
+              {imageUri.map((uri:any, index:any) => (
+                <View key={index} style={styles.slide}>
+                  <Image source={{ uri }} style={styles.swiperImage} />
+                </View>
+              ))}
+            </Swiper>
+          </View>
+        )}
+
+        <Text style={styles.sectionTitle}>Description</Text>
         <TextInput
           editable
           multiline
           numberOfLines={4}
-          maxLength={40}
-          placeholder="Enter title here..."
-          style={styles.postSummary}
-          onChangeText={(text) => setTitle(text)}
-          value={title}
-        ></TextInput>
-        <GradientButton onPress={handleImageUpload} title="Choose"></GradientButton>
-        <Text style={styles.imageText}>(Select upto 3 images)</Text>
-        <View style={styles.imageContainer}>
-          {imageUri.length > 0 && (
-            <TouchableOpacity
-            style={styles.clearButton}
-              onPress={() => setImageUri([])}
-            >
-            <MaterialIcons name="clear" size={20} color="black" />            
-            </TouchableOpacity>
-          )}
-              <View style={styles.imageContainer}>
-              {imageUri.length > 0 && (
-                <Swiper
-                  style={styles.swiper}
-                  dotStyle={styles.dotStyle}
-                  activeDotStyle={styles.activeDotStyle}
-                  paginationStyle={styles.pagination}
-                  showsButtons={false}
-                  loop={false}
-                >
-                  {imageUri.map((uri:any, index:any) => (
-                    <View key={index} style={styles.slide}>
-                      <Image source={{ uri }} style={styles.swiperImage} />
-                    </View>
-                  ))}
-                </Swiper>
-              )}
-              </View>  
-        </View>
-        <TextInput
-          editable
-          multiline
-          numberOfLines={10}
-          maxLength={200}
-          placeholder="Enter body here...max 250 characters"
+          placeholder="Tell us about your outfit and get personalized feedback..."
           style={styles.postContent}
           onChangeText={(text) => setContent(text)}
           value={content}
-        ></TextInput>
+        />
         <GradientButton 
           onPress={postData} 
-          title="Submit" 
+          title="Post for Review" 
           disabled={!isSubmitEnabled}
-        ></GradientButton>
+        />
       </View>
     </ScrollView>
   );
@@ -149,85 +152,103 @@ export default function AddPost() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#faf8ff",
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingVertical: 90,
+    paddingVertical: 20,
     paddingHorizontal: 16,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
-    fontStyle: "italic",
-    color:"#333"
+    color: "#6941C6",
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    alignSelf: 'flex-start',
+    marginBottom: 8,
   },
   postBox: {
     width: "100%",
     alignItems: "center",
     justifyContent: "flex-start",
-    gap: 15,
+    gap: 24,
   },
-  postSummary: {
+  occasionSelector: {
     width: "100%",
-    height: 100,
-    borderWidth: 0.5,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#E4E4E7",
     borderRadius: 8,
-    padding: 10,
-    textAlignVertical: "top",
-    marginTop: 20,
-    borderColor:"#f0f0f0"
+    backgroundColor: "white",
   },
-  postContent: {
+  occasionText: {
+    fontSize: 16,
+    color: "#666",
+  },
+  uploadContainer: {
     width: "100%",
-    height: 150,
-    borderWidth: 0.5,
+    height: 200,
+    borderWidth: 2,
+    borderColor: "#E4E4E7",
+    borderStyle: "dashed",
     borderRadius: 8,
-    padding: 20,
-    textAlignVertical: "top",
-    marginTop: 10,
-    borderColor:"#f0f0f0"
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
+  },
+  uploadIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "#F4F4F5",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  uploadText: {
+    fontSize: 16,
+    color: "#666",
   },
   imageContainer: {
     width: "100%",
-    //marginVertical: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    height: 200,
+    borderRadius: 8,
+    overflow: "hidden",
   },
   clearButton: {
-    padding: 8,
-    marginBottom: 10,
-    alignSelf: "flex-end",
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    zIndex: 1,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 4,
   },
-  button: {
-    backgroundColor: "#f0f0f0",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
+  postContent: {
     width: "100%",
-    alignItems: "center",
-  },
-  submitButton: {
-    backgroundColor: "#e8e8e8",
-    marginTop: 10,
-  },
-  buttonText: {
-    fontSize: 16,
-    color: "#666",
-    fontWeight: "500",
-  },
-  imageWrapper: {
-    width: '100%',
-    alignItems: 'center',
-    marginVertical: 5,
-  },
-  image: {
-    width: 300,
-    height: 300,
+    minHeight: 120,
+    borderWidth: 1,
+    borderColor: "#E4E4E7",
+    borderRadius: 8,
+    padding: 12,
+    textAlignVertical: "top",
+    backgroundColor: "white",
   },
   swiper: {
-    height: 250,
+    height: 200,
   },
   slide: {
     flex: 1,
@@ -235,13 +256,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   swiperImage: {
-    width: 250,
-    height: 250,
-    //resizeMode: 'cover',
-    borderRadius: 10,
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
   dotStyle: {
-    backgroundColor: '#D9D9D9',
+    backgroundColor: '#E4E4E7',
     width: 8,
     height: 8,
     borderRadius: 4,
@@ -249,7 +269,7 @@ const styles = StyleSheet.create({
     marginRight: 3,
   },
   activeDotStyle: {
-    backgroundColor: '#333',
+    backgroundColor: '#6941C6',
     width: 8,
     height: 8,
     borderRadius: 4,
@@ -257,12 +277,6 @@ const styles = StyleSheet.create({
     marginRight: 3,
   },
   pagination: {
-    bottom: -15,
-  },
-  imageText: {
-    fontSize: 12,
-    color: "#666",
-    fontStyle: "italic",
-    alignSelf: "flex-start",
+    bottom: 10,
   },
 });
