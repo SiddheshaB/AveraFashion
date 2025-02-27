@@ -1,76 +1,168 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useSelector } from "react-redux";
 import signOut from "../../utils/signOut";
 import { useDispatch } from "react-redux";
+import { FontAwesome } from '@expo/vector-icons';
 
 export default function Profile() {
   const users = useSelector((state: any) => state.users[0].userInfo);
   const dispatch = useDispatch();
+  
   const handleLogout = () => {
     signOut(dispatch);
   };
-  const formatDate=(timestamp:string)=>{
-    const date=new Date(timestamp);
+
+  const formatDate = (timestamp: string) => {
+    const date = new Date(timestamp);
     return date.toISOString().split('T')[0];
-  }
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.profileCard}>
-        <View style={styles.contentContainer}>
-          <Text style={styles.greeting}>Hello,</Text>
-          <Text style={styles.name}>{users.user.user_metadata.full_name}</Text>
-        </View>
-        <Text style={styles.email}>{users.user.email}</Text>
-        <Text style={styles.date}>Member since: {formatDate(users.user.created_at)}</Text>
-        <TouchableOpacity onPress={handleLogout}>
-          <Text style={styles.signOutText}>Sign Out</Text>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.settingsButton}>
+          <FontAwesome name="gear" size={24} color="#333" />
         </TouchableOpacity>
       </View>
+
+      <View style={styles.profileSection}>
+        <Image 
+          source={{ uri: users.user.user_metadata.avatar_url || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }} 
+          style={styles.profileImage} 
+        />
+        <Text style={styles.name}>{users.user.user_metadata.full_name}</Text>
+        <Text style={styles.role}>New Member</Text>
+      </View>
+
+      <View style={styles.statsSection}>
+        <View style={styles.statItem}>
+          <Text style={styles.statNumber}>0</Text>
+          <Text style={styles.statLabel}>Posts</Text>
+        </View>
+        <View style={styles.statDivider} />
+        <View style={styles.statItem}>
+          <Text style={styles.statNumber}>0</Text>
+          <Text style={styles.statLabel}>Reviews</Text>
+        </View>
+      </View>
+
+      <View style={styles.infoSection}>
+        <View style={styles.infoItem}>
+          <FontAwesome name="envelope" size={16} color="#666" style={styles.infoIcon} />
+          <Text style={styles.infoText}>{users.user.email}</Text>
+        </View>
+        <View style={styles.infoItem}>
+          <FontAwesome name="calendar" size={16} color="#666" style={styles.infoIcon} />
+          <Text style={styles.infoText}>
+            Joined {formatDate(users.user.created_at)}
+          </Text>
+        </View>
+      </View>
+
+      <TouchableOpacity style={styles.signOutButton} onPress={handleLogout}>
+        <Text style={styles.signOutText}>Sign Out</Text>
+      </TouchableOpacity>
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    backgroundColor: "#fff",
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    alignItems: 'flex-end',
+  },
+  settingsButton: {
+    padding: 8,
+  },
+  profileSection: {
     alignItems: "center",
-    backgroundColor: "white",
+    paddingVertical: 20,
   },
-  profileCard: {
-    borderRadius: 20,
-    shadowColor: "grey",
-    backgroundColor: "white",
-    height: 500,
-    width: 320,
-    elevation: 5,
-    padding: 20,
-  },
-  contentContainer: {
-    flex: 1,
-    alignItems: "flex-start",
-    width: "100%",
-  },
-  greeting: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 8,
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: 16,
   },
   name: {
+    fontSize: 24,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 4,
+  },
+  role: {
+    fontSize: 16,
+    color: "#666",
+  },
+  statsSection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 30,
+    marginTop: 20,
+    gap: 40,
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: "#333",
+    marginBottom: 4,
+  },
+  statLabel: {
     fontSize: 14,
-    marginBottom: 16,
-    textTransform: "uppercase"
+    color: "#666",
+  },
+  statDivider: {
+    width: 1,
+    height: '100%',
+    backgroundColor: '#e0e0e0',
+  },
+  infoSection: {
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+    backgroundColor: '#f8f8f8',
+    marginTop: 20,
+    gap: 16,
+  },
+  infoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  infoIcon: {
+    width: 24,
+    marginRight: 12,
+  },
+  infoText: {
+    fontSize: 15,
+    color: "#333",
+    flex: 1,
   },
   email: {
     fontSize: 16,
-    marginBottom: 24,
+    color: "#333",
+    marginBottom: 8,
+  },
+  memberSince: {
+    fontSize: 14,
+    color: "#666",
+  },
+  signOutButton: {
+    marginTop: 30,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: 'center',
   },
   signOutText: {
     fontSize: 16,
-    color: "#666",
-    textDecorationLine: "underline",
+    color: "#e74c3c",
+    fontWeight: '500',
   },
-  date:{
-    fontSize: 10,
-    color: "#666",
-  }
 });

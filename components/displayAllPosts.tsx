@@ -289,7 +289,7 @@ export default function DisplayAllPosts() {
                   />
                   <View style={styles.userDetails}>
                     <Text style={styles.userName}>{item.profiles.full_name}</Text>
-                    <Text style={styles.userRole}>Style Curator</Text>
+                    <Text style={styles.userRole}>New Member</Text>
                   </View>
                 </View>
 
