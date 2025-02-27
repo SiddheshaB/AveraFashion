@@ -347,6 +347,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8f8f8",
+    width: '100%',
   },
   // Header styles
   headerContainer: {
@@ -524,5 +525,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    width: '100%',
+    backgroundColor: '#f8f8f8',
   },
 });
