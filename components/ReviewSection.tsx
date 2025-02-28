@@ -15,7 +15,7 @@ import { FontAwesome } from '@expo/vector-icons';
 
 /**
  * StarRating Component
- * Displays interactive or static star rating
+ * Displays interactive or static star rating with support for half stars
  */
 const StarRating = ({ 
   rating, 
@@ -26,24 +26,60 @@ const StarRating = ({
   size?: number; 
   onRatingChange?: ((rating: number) => void) | null;
 }) => {
+  // Render individual star with support for full, empty, or half-filled states
+  const renderStar = (position: number) => {
+    const filled = rating >= position;
+    const partialFill = !filled && rating > position - 1;
+    
+    return (
+      <TouchableOpacity
+        key={position}
+        onPress={() => onRatingChange && onRatingChange(position)}
+        disabled={!onRatingChange}
+      >
+        <FontAwesome
+          name={partialFill ? 'star-half-o' : (filled ? 'star' : 'star-o')}
+          size={size}
+          color="#FFD700"
+          style={styles.star}
+        />
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.starContainer}>
-      {[1, 2, 3, 4, 5].map((star) => (
-        <TouchableOpacity
-          key={star}
-          onPress={() => onRatingChange && onRatingChange(star)}
-          disabled={!onRatingChange}
-        >
-          <FontAwesome
-            name={rating >= star ? 'star' : 'star-o'}
-            size={size}
-            color="#FFD700"
-            style={styles.star}
-          />
-        </TouchableOpacity>
-      ))}
+      {[1, 2, 3, 4, 5].map((position) => renderStar(position))}
     </View>
   );
+};
+
+/**
+ * Format a date to "X days/months ago" format
+ */
+const getTimeAgo = (date: string) => {
+  const now = new Date();
+  const reviewDate = new Date(date);
+  const diffInMillis = now.getTime() - reviewDate.getTime();
+  const diffInDays = Math.floor(diffInMillis / (1000 * 60 * 60 * 24));
+  const diffInMonths = Math.floor(diffInDays / 30);
+  const diffInYears = Math.floor(diffInMonths / 12);
+
+  if (diffInDays < 1) {
+    return 'today';
+  } else if (diffInDays === 1) {
+    return 'yesterday';
+  } else if (diffInDays < 30) {
+    return `${diffInDays} days ago`;
+  } else if (diffInMonths === 1) {
+    return '1 month ago';
+  } else if (diffInMonths < 12) {
+    return `${diffInMonths} months ago`;
+  } else if (diffInYears === 1) {
+    return '1 year ago';
+  } else {
+    return `${diffInYears} years ago`;
+  }
 };
 
 /**
@@ -71,12 +107,13 @@ type ReviewSectionProps = {
 /**
  * ReviewSection Component
  * Displays a list of reviews for a post and allows users to add new reviews
+ * Post owner cannot review their own post
  */
 export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProps) {
   // State Management
   const [reviews, setReviews] = useState<Review[]>([]);
   const [newReview, setNewReview] = useState('');
-  const [rating, setRating] = useState(5);
+  const [rating, setRating] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [averageRating, setAverageRating] = useState(0);
   
@@ -84,11 +121,11 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
   const user = useSelector((state: any) => state.users?.[0]?.userInfo);
 
   /**
-   * Fetches all reviews for the current post from Supabase
-   * Including the reviewer's profile information
+   * Fetches reviews and calculates average rating
    */
   const fetchReviews = async () => {
     try {
+      setIsLoading(true);
       const { data, error } = await supabase
         .from('reviews')
         .select(`
@@ -102,15 +139,18 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+
       setReviews(data || []);
 
       // Calculate average rating
       if (data && data.length > 0) {
         const avg = data.reduce((sum, review) => sum + review.rating, 0) / data.length;
-        setAverageRating(Math.round(avg * 10) / 10);
+        setAverageRating(avg);
       }
     } catch (error) {
-      console.error('Error fetching reviews:', error);
+      Alert.alert('Error', 'Failed to fetch reviews');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -145,7 +185,7 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
               // Recalculate average rating
               if (updatedReviews.length > 0) {
                 const newAvg = updatedReviews.reduce((sum, review) => sum + review.rating, 0) / updatedReviews.length;
-                setAverageRating(Math.round(newAvg * 10) / 10);
+                setAverageRating(newAvg);
               } else {
                 setAverageRating(0);
               }
@@ -209,11 +249,11 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
       // Update local state with the new review
       setReviews(prev => [data, ...prev]);
       setNewReview('');
-      setRating(5);
+      setRating(0);
       
       // Update average rating
       const newAvg = (averageRating * reviews.length + rating) / (reviews.length + 1);
-      setAverageRating(Math.round(newAvg * 10) / 10);
+      setAverageRating(newAvg);
     } catch (error) {
       console.error('Error adding review:', error);
       Alert.alert('Error', 'Failed to submit review. Please try again.');
@@ -234,47 +274,49 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
     });
   };
 
-  // Fetch reviews when component mounts or postId changes
+  // Load reviews on mount and when postId changes
   useEffect(() => {
     fetchReviews();
   }, [postId]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Reviews</Text>
-      
-      {/* Average Rating Display */}
+      {/* Rating Section */}
       {reviews.length > 0 && (
-        <View style={styles.averageRating}>
+        <View style={styles.ratingBlock}>
+          <View style={styles.ratingContainer}>
+            <StarRating rating={averageRating} size={20} />
+            <Text style={styles.ratingLabel}>{averageRating.toFixed(1)}</Text>
+          </View>
           <Text style={styles.averageRatingText}>
-            {averageRating} / 5 ({reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
+            Average rating from {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'}
           </Text>
-          <StarRating rating={averageRating} size={24} />
         </View>
       )}
 
-      {/* Review Input Section */}
+      {/* Write Review Section */}
       {user && user.user.id !== postOwnerId ? (
-        <View style={styles.inputContainer}>
-          <View style={styles.ratingContainer}>
-            <Text style={styles.ratingLabel}>Your Rating:</Text>
+        <View style={styles.writeReviewBlock}>
+          <Text style={styles.sectionTitle}>Write a Review</Text>
+          <View style={styles.reviewStarsContainer}>
             <StarRating
               rating={rating}
-              size={32}
-              onRatingChange={setRating}
+              size={24}
+              onRatingChange={(newRating) => setRating(newRating)}
             />
           </View>
           <TextInput
             style={styles.input}
+            placeholder="Share your thoughts about this style..."
             value={newReview}
             onChangeText={setNewReview}
-            placeholder="Write your review (optional)..."
             multiline
+            numberOfLines={4}
           />
           <TouchableOpacity
             style={[
               styles.submitButton,
-              !rating && styles.submitButtonDisabled
+              (!rating) && styles.submitButtonDisabled,
             ]}
             onPress={addReview}
             disabled={isLoading || !rating}
@@ -293,33 +335,45 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
       )}
 
       {/* Reviews List */}
-      <FlatList
-        data={reviews}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.reviewContainer}>
-            <View style={styles.reviewHeader}>
-              <View style={styles.reviewHeaderLeft}>
-                <Text style={styles.userName}>{item.profiles.full_name}</Text>
-                <Text style={styles.timestamp}>{formatDate(item.created_at)}</Text>
-              </View>
-              {(postOwnerId === user?.user?.id || item.user_id === user?.user?.id) && (
-                <TouchableOpacity
-                  onPress={() => deleteReview(item.id)}
-                  style={styles.deleteButton}
-                >
-                  <FontAwesome name="trash-o" size={18} color="#e0e0e0" />
-                </TouchableOpacity>
+      {reviews.length > 0 && (
+        <>
+          <Text style={[styles.sectionTitle, styles.reviewsTitle]}>Reviews</Text>
+          {isLoading ? (
+            <ActivityIndicator size="large" color="#000" />
+          ) : (
+            <FlatList
+              data={reviews}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View style={styles.reviewCardContainer}>
+                  <View style={styles.reviewCard}>
+                    <View style={styles.reviewHeader}>
+                      <View style={styles.reviewHeaderLeft}>
+                        <Text style={styles.userName}>{item.profiles.full_name}</Text>
+                        <Text style={styles.timestamp}>
+                          {getTimeAgo(item.created_at)}
+                        </Text>
+                      </View>
+                      <StarRating rating={item.rating} size={16} />
+                      {(postOwnerId === user?.user?.id || item.user_id === user?.user?.id) && (
+                        <TouchableOpacity
+                          style={styles.deleteButton}
+                          onPress={() => deleteReview(item.id)}
+                        >
+                          <FontAwesome name="trash-o" size={20} color="#666" />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                    <Text style={styles.reviewContent}>{item.review}</Text>
+                  </View>
+                </View>
               )}
-            </View>
-            <StarRating rating={item.rating} size={16} />
-            {item.review && (
-              <Text style={styles.reviewContent}>{item.review}</Text>
-            )}
-          </View>
-        )}
-        contentContainerStyle={styles.reviewsList}
-      />
+              style={styles.reviewsList}
+              contentContainerStyle={styles.reviewsListContent}
+            />
+          )}
+        </>
+      )}
     </View>
   );
 }
@@ -327,59 +381,105 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    backgroundColor: '#f8f8f8',
+  },
+  // Rating Block
+  ratingBlock: {
     backgroundColor: '#ffffff',
-  },
-  starContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  star: {
-    marginRight: 4,
+    paddingVertical: 20,
+    marginBottom: 15,
+    marginHorizontal: 15,
+    borderRadius: 12,
   },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
-  },
-  ratingLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginRight: 12,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  averageRating: {
-    alignItems: 'center',
-    marginBottom: 16,
-    padding: 16,
-    //backgroundColor: '#FBFAF4',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#E8E2C0",
-  },
-  averageRatingText: {
-    fontSize: 16,
-    fontWeight: '600',
+    paddingHorizontal: 20,
     marginBottom: 8,
   },
-  reviewsList: {
-    paddingTop: 16,
+  ratingLabel: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginLeft: 10,
+    color: '#1a1a1a',
   },
-  reviewContainer: {
-   // backgroundColor: '#F5FBF4',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 12,
+  averageRatingText: {
+    fontSize: 12,
+    color: '#666',
+    paddingHorizontal: 20,
+  },
+  // Write Review Block
+  writeReviewBlock: {
+    backgroundColor: '#ffffff',
+    paddingVertical: 20,
+    marginBottom: 15,
+    marginHorizontal: 15,
+    borderRadius: 12,
+  },
+  sectionTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 15,
+    paddingHorizontal: 20,
+  },
+  reviewStarsContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 15,
+  },
+  input: {
+    marginHorizontal: 20,
     borderWidth: 1,
-    borderColor: "#C0E8E2",
+    borderColor: '#e0e0e0',
+    borderRadius: 12,
+    padding: 15,
+    fontSize: 13,
+    color: '#444',
+    height: 100,
+    textAlignVertical: 'top',
+    marginBottom: 15,
+    backgroundColor: '#ffffff',
+  },
+  submitButton: {
+    marginHorizontal: 20,
+    backgroundColor: '#8B44FF',
+    borderRadius: 25,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  submitButtonDisabled: {
+    backgroundColor: 'rgba(139, 68, 255, 0.5)',
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  // Reviews Block
+  reviewsTitle: {
+    marginHorizontal: 15,
+    marginBottom: 10,
+    marginTop: 15,
+  },
+  reviewsList: {
+    flex: 1,
+  },
+  reviewsListContent: {
+    paddingHorizontal: 15,
+    paddingBottom: 15,
+  },
+  reviewCardContainer: {
+    marginBottom: 10,
+    marginHorizontal: 15,
+  },
+  reviewCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 15,
   },
   reviewHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 8,
   },
   reviewHeaderLeft: {
@@ -387,50 +487,35 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     padding: 4,
+    marginLeft: 10,
   },
   userName: {
     fontWeight: '600',
     fontSize: 14,
+    color: '#1a1a1a',
+    marginBottom: 2,
   },
   timestamp: {
     color: '#666',
     fontSize: 12,
   },
   reviewContent: {
-    fontSize: 14,
+    fontSize: 13,
     lineHeight: 20,
+    color: '#4a4a4a',
     marginTop: 8,
-  },
-  inputContainer: {
-    backgroundColor: '#f8f8f8',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  input: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
-  submitButton: {
-    backgroundColor: '#000',
-    borderRadius: 8,
-    padding: 12,
-    alignItems: 'center',
-  },
-  submitButtonDisabled: {
-    backgroundColor: '#999',
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontWeight: '600',
   },
   signInPrompt: {
     textAlign: 'center',
     color: '#666',
     marginVertical: 16,
+    fontSize: 12,
+  },
+  starContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  star: {
+    marginRight: 2,
   },
 });

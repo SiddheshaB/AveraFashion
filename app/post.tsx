@@ -1,3 +1,11 @@
+/**
+ * PostScreen Component
+ * Displays a detailed view of a fashion post including:
+ * - Image carousel
+ * - User profile
+ * - Post description
+ * - Reviews section
+ */
 import React from 'react';
 import {
   View,
@@ -12,14 +20,12 @@ import { useLocalSearchParams } from 'expo-router';
 import ReviewSection from '../components/ReviewSection';
 
 export default function PostScreen() {
-  // Get post data from URL parameters
+  // Get post data from URL parameters and parse JSON
   const { post } = useLocalSearchParams();
-  // Parse the JSON string back into an object
   const postData = JSON.parse(post as string);
-  // Parse the image URLs array
   const images = JSON.parse(postData.image_url);
 
-  // Organize post content into sections
+  // Organize post content into sections for SectionList
   const sections = [
     {
       title: 'post',
@@ -27,7 +33,7 @@ export default function PostScreen() {
         type: 'content',
         content: (
           <>
-            {/* Images Section - Shows image carousel */}
+            {/* Image Carousel */}
             {images.length > 0 && (
               <View style={styles.imageSectionContainer}>
                 <View style={styles.imageSection}>
@@ -51,29 +57,32 @@ export default function PostScreen() {
                 </View>
               </View>
             )}
-            {/* User Profile Section - Shows avatar and name */}
-            <View style={styles.profileSectionContainer}>
-            <View style={styles.profileSection}>
-              <Image 
-                source={{ uri: postData.profiles.avatar_url }} 
-                style={styles.avatar}
-              />
-              <Text style={styles.fullName}>{postData.profiles.full_name}</Text>
-            </View>
-               {/* Title Section - Shows post title */}
-            <View style={styles.titleSection}>
-              <Text style={styles.title}>{postData.title}</Text>
-            </View>
-            {/* Content Section - Shows post content */}
-            <View style={styles.contentSection}>
-              <Text style={styles.content}>{postData.content}</Text>
-            </View></View>
 
-            {/* Reviews Section */}
-            <ReviewSection 
-              postId={postData.post_id} 
-              postOwnerId={postData.user_id}
-            />
+            {/* Profile and Content Section */}
+            <View style={styles.profileSectionContainer}>
+              {/* User Profile */}
+              <View style={styles.profileSection}>
+                <Image 
+                  source={{ uri: postData.profiles.avatar_url }} 
+                  style={styles.avatar}
+                />
+                <View style={styles.profileInfo}>
+                  <Text style={styles.fullName}>{postData.profiles.full_name}</Text>
+                  <Text style={styles.userRole}>Style Curator</Text>
+                </View>
+              </View>
+
+              {/* Post Description */}
+              <View style={styles.contentSection}>
+                <Text style={styles.content}>Trying out this new summer look with a floral dress and minimal accessories. Would love to hear your thoughts!</Text>
+              </View>
+
+              {/* Reviews Section */}
+              <ReviewSection 
+                postId={postData.post_id} 
+                postOwnerId={postData.user_id}
+              />
+            </View>
           </>
         )
       }]
@@ -97,43 +106,54 @@ export default function PostScreen() {
 // Get screen dimensions for responsive sizing
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-// Styles for the component
+// Styles organized by section
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#f8f8f8',
   },
-  // Profile section styles - top bar with user info
+  // Profile Section
+  profileSectionContainer: {
+    paddingTop: 20,
+    marginBottom: 15,
+  },
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-  
+    paddingHorizontal: 20,
+    paddingBottom: 15,
+  },
+  profileInfo: {
+    marginLeft: 12,
   },
   avatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    marginRight: 12,
   },
   fullName: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
+    color: '#000',
+    marginBottom: 2,
   },
-  // Title section styles
-  titleSection: {
-    padding: 10,
+  userRole: {
+    fontSize: 12,
+    color: '#666',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  // Content Section
+  contentSection: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
-  // Image section styles
+  content: {
+    fontSize: 13,
+    lineHeight: 20,
+    color: '#333',
+  },
+  // Image Carousel Section
   imageSectionContainer: {
     overflow: 'hidden',
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    zIndex: 5,
   },
   imageSection: {
     height: screenHeight * 0.5,
@@ -150,11 +170,12 @@ const styles = StyleSheet.create({
     width: screenWidth,
     height: '100%',
   },
+  // Pagination Dots
   dot: {
     backgroundColor: 'rgba(0,0,0,.2)',
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     marginLeft: 3,
     marginRight: 3,
     marginTop: 3,
@@ -162,31 +183,12 @@ const styles = StyleSheet.create({
   },
   activeDot: {
     backgroundColor: '#000',
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     marginLeft: 3,
     marginRight: 3,
     marginTop: 3,
     marginBottom: 3,
   },
-  // Content section styles
-  contentSection: {
-    padding: 16,
-  },
-  content: {
-    fontSize: 16,
-    lineHeight: 24,
-  },
-  //Profile Section Styles
-  profileSectionContainer: {
-    backgroundColor: '#faf4fb',
-    marginTop: -30,
-    paddingLeft: 5,
-    paddingTop:20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    //borderWidth: 1,
-    //borderColor: "#724C9D",
-  }
 });
