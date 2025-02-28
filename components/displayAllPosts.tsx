@@ -260,6 +260,13 @@ export default function DisplayAllPosts() {
                     dotStyle={styles.dotStyle}
                     activeDotStyle={styles.activeDot}
                     showsButtons={false}
+                    renderPagination={(index, total) => (
+                      <View style={styles.paginationContainer}>
+                        <Text style={styles.paginationText}>
+                          {index + 1}/{total}
+                        </Text>
+                      </View>
+                    )}
                   >
                     {(JSON.parse(item.image_url)).map((uri: string, index: number) => (
                       <TouchableOpacity 
@@ -513,6 +520,19 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
+  },
+  paginationContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    padding: 6,
+    borderRadius: 12,
+  },
+  paginationText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
   },
   // FlatList styles
   flatList: {
