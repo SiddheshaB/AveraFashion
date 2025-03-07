@@ -82,7 +82,7 @@ export default function PostScreen() {
 
               {/* Post Description */}
               <View style={styles.contentSection}>
-                <Text style={styles.content}>Trying out this new summer look with a floral dress and minimal accessories. Would love to hear your thoughts!</Text>
+                <Text style={styles.content}>{postData.content}</Text>
               </View>
 
               {/* AI Feedback Card - Only visible to post owner */}
