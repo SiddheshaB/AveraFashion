@@ -33,17 +33,32 @@ export default function AiFeedbackScreen() {
       setIsLoading(true);
       setError(null);
 
-      // First, fetch the post's image URLs from Supabase
-      const { data: post, error: postError } = await supabase
+      // First, check if AI feedback already exists
+      const { data: existingPost, error: existingError } = await supabase
         .from('posts')
-        .select('image_url')
+        .select('ai_feedback, image_url')
         .eq('post_id', id)
         .single();
 
-      if (postError) throw postError;
-      if (!post) throw new Error('Post not found');
+      if (existingError) throw existingError;
+      if (!existingPost) throw new Error('Post not found');
 
-      const imageUrls = JSON.parse(post.image_url);
+      // If AI feedback already exists, use that
+      if (existingPost.ai_feedback) {
+        setFeedback({
+          rating: existingPost.ai_feedback.rating,
+          fitAndProportion: existingPost.ai_feedback.fitAndProportion,
+          colorAndPattern: existingPost.ai_feedback.colorAndPattern,
+          styleAndOccasion: existingPost.ai_feedback.styleAndOccasion,
+          accessoriesAndDetails: existingPost.ai_feedback.accessoriesAndDetails,
+          groomingAndPresentation: existingPost.ai_feedback.groomingAndPresentation,
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // If no feedback exists, generate new feedback
+      const imageUrls = JSON.parse(existingPost.image_url);
 
       // Call the edge function with the image URLs
       const { data: feedbackData, error: feedbackError } = await supabase.functions.invoke(
