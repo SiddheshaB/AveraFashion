@@ -83,7 +83,10 @@ export default function PostScreen() {
               {/* AI Feedback Card */}
               <TouchableOpacity
                 style={styles.aiFeedbackCard}
-                onPress={() => router.push(`/ai-feedback/${postData.post_id}`)}
+                onPress={() => router.push({
+                  pathname: '/ai-feedback',
+                  params: { id: postData.post_id }
+                })}
               >
                 <View style={styles.aiFeedbackContent}>
                   <FontAwesome name="magic" size={24} color="#8B44FF" style={styles.aiIcon} />
