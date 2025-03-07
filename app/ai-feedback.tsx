@@ -3,11 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  ActivityIndicator,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { supabase } from '../utils/supabase';
+import LottieView from 'lottie-react-native';
 
 type AiFeedback = {
   rating: number;
@@ -30,6 +31,7 @@ export default function AiFeedbackScreen() {
 
   const fetchFeedback = async () => {
     try {
+      const startTime = Date.now();
       setIsLoading(true);
       setError(null);
 
@@ -45,6 +47,13 @@ export default function AiFeedbackScreen() {
 
       // If AI feedback already exists, use that
       if (existingPost.ai_feedback) {
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, 1000 - elapsedTime);
+        
+        if (remainingTime > 0) {
+          await new Promise(resolve => setTimeout(resolve, remainingTime));
+        }
+
         setFeedback({
           rating: existingPost.ai_feedback.rating,
           fitAndProportion: existingPost.ai_feedback.fitAndProportion,
@@ -83,6 +92,13 @@ export default function AiFeedbackScreen() {
         // Continue showing the feedback even if saving fails
       }
 
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, 1500 - elapsedTime);
+      
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      }
+
       setFeedback({
         rating: feedbackData.rating,
         fitAndProportion: feedbackData.fitAndProportion,
@@ -112,8 +128,13 @@ export default function AiFeedbackScreen() {
       
       {isLoading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#8B44FF" />
-          <Text style={styles.loadingText}>Analyzing your style...</Text>
+          <LottieView
+            source={require('../assets/animations/OutfitSelectAnimation.json')}
+            autoPlay
+            loop
+            style={styles.lottieAnimation}
+          />
+          <Text style={styles.loadingText}>Analyzing your outift...</Text>
         </View>
       ) : error ? (
         <View style={styles.errorContainer}>
@@ -174,6 +195,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f8f8f8',
+  },
+  lottieAnimation: {
+    width: Dimensions.get('window').width * 0.7,
+    height: Dimensions.get('window').width * 0.7,
   },
   loadingText: {
     marginTop: 16,
