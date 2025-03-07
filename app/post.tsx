@@ -20,6 +20,7 @@ import Swiper from 'react-native-swiper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import ReviewSection from '../components/ReviewSection';
 import { FontAwesome } from '@expo/vector-icons';
+import { useSelector } from 'react-redux';
 
 export default function PostScreen() {
   // Get post data from URL parameters and parse JSON
@@ -27,6 +28,10 @@ export default function PostScreen() {
   const router = useRouter();
   const postData = JSON.parse(post as string);
   const images = JSON.parse(postData.image_url);
+  
+  // Get current user from Redux store
+  const user = useSelector((state: any) => state.users?.[0]?.userInfo);
+  const isPostOwner = user?.user?.id === postData.user_id;
 
   // Organize post content into sections for SectionList
   const sections = [
@@ -80,23 +85,26 @@ export default function PostScreen() {
                 <Text style={styles.content}>Trying out this new summer look with a floral dress and minimal accessories. Would love to hear your thoughts!</Text>
               </View>
 
-              {/* AI Feedback Card */}
-              <TouchableOpacity
-                style={styles.aiFeedbackCard}
-                onPress={() => router.push({
-                  pathname: '/ai-feedback',
-                  params: { id: postData.post_id }
-                })}
-              >
-                <View style={styles.aiFeedbackContent}>
-                  <FontAwesome name="magic" size={24} color="#8B44FF" style={styles.aiIcon} />
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.aiFeedbackTitle}>AI Style Analysis</Text>
-                    <Text style={styles.aiFeedbackSubtitle}>Get personalized fashion insights</Text>
+              {/* AI Feedback Card - Only visible to post owner */}
+              {isPostOwner && (
+                <TouchableOpacity
+                  style={styles.aiFeedbackCard}
+                  onPress={() => router.push({
+                    pathname: '/ai-feedback',
+                    params: { id: postData.post_id }
+                  })}
+                >
+                  <View style={styles.aiFeedbackContent}>
+                    <FontAwesome name="magic" size={24} color="#8B44FF" style={styles.aiIcon} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.aiFeedbackTitle}>AI Style Analysis</Text>
+                      <Text style={styles.aiFeedbackSubtitle}>Get personalized fashion insights</Text>
+                      <Text style={styles.ownerOnlyText}>Only visible to you</Text>
+                    </View>
+                    <FontAwesome name="chevron-right" size={16} color="#666" />
                   </View>
-                  <FontAwesome name="chevron-right" size={16} color="#666" />
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              )}
 
               {/* Reviews Section */}
               <ReviewSection 
@@ -238,5 +246,11 @@ const styles = StyleSheet.create({
   aiFeedbackSubtitle: {
     fontSize: 12,
     color: '#666',
+  },
+  ownerOnlyText: {
+    fontSize: 11,
+    color: '#8B44FF',
+    marginTop: 4,
+    fontWeight: '500',
   },
 });

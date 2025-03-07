@@ -55,6 +55,19 @@ export default function AiFeedbackScreen() {
 
       if (feedbackError) throw feedbackError;
 
+      // Save feedback to Supabase
+      const { error: updateError } = await supabase
+        .from('posts')
+        .update({
+          ai_feedback: feedbackData
+        })
+        .eq('post_id', id);
+
+      if (updateError) {
+        console.error('Error saving feedback:', updateError);
+        // Continue showing the feedback even if saving fails
+      }
+
       setFeedback({
         rating: feedbackData.rating,
         fitAndProportion: feedbackData.fitAndProportion,
