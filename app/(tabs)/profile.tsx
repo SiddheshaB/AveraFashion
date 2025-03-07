@@ -11,10 +11,16 @@ export default function Profile() {
   const dispatch = useDispatch();
   const [postCount, setPostCount] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
+  const [xpPoints, setXpPoints] = useState(0);
   
   useEffect(() => {
     fetchUserStats();
   }, []);
+
+  const calculateXP = (posts: number, reviews: number) => {
+    // XP calculation: 10 points per post, 5 points per review
+    return (posts * 10) + (reviews * 5);
+  };
 
   const fetchUserStats = async () => {
     try {
@@ -35,6 +41,9 @@ export default function Profile() {
 
       if (reviewsError) throw reviewsError;
       setReviewCount(reviews || 0);
+      
+      // Calculate and set XP points
+      setXpPoints(calculateXP(posts || 0, reviews || 0));
 
     } catch (error) {
       console.error('Error fetching user stats:', error);
@@ -59,6 +68,9 @@ export default function Profile() {
         />
         <Text style={styles.name}>{users.user.user_metadata.full_name}</Text>
         <Text style={styles.role}>New Member</Text>
+        <View style={styles.xpBadge}>
+          <Text style={styles.xpText}>{xpPoints} XP</Text>
+        </View>
       </View>
 
       <View style={styles.statsSection}>
@@ -117,6 +129,19 @@ const styles = StyleSheet.create({
   role: {
     fontSize: 16,
     color: "#666",
+    marginBottom: 8,
+  },
+  xpBadge: {
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 16,
+    marginBottom: 16,
+  },
+  xpText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   statsSection: {
     flexDirection: 'row',
