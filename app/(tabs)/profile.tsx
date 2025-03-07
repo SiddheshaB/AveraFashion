@@ -52,12 +52,6 @@ export default function Profile() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.settingsButton}>
-          <FontAwesome name="gear" size={24} color="#333" />
-        </TouchableOpacity>
-      </View>
-
       <View style={styles.profileSection}>
         <Image 
           source={{ uri: users.user.user_metadata.avatar_url || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }} 
@@ -103,14 +97,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    alignItems: 'flex-end',
-  },
-  settingsButton: {
-    padding: 8,
   },
   profileSection: {
     alignItems: "center",
@@ -177,15 +163,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#333",
     flex: 1,
-  },
-  email: {
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 8,
-  },
-  memberSince: {
-    fontSize: 14,
-    color: "#666",
   },
   signOutButton: {
     marginTop: 30,
