@@ -14,14 +14,17 @@ import {
   StyleSheet,
   Dimensions,
   SectionList,
+  TouchableOpacity,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import ReviewSection from '../components/ReviewSection';
+import { FontAwesome } from '@expo/vector-icons';
 
 export default function PostScreen() {
   // Get post data from URL parameters and parse JSON
   const { post } = useLocalSearchParams();
+  const router = useRouter();
   const postData = JSON.parse(post as string);
   const images = JSON.parse(postData.image_url);
 
@@ -76,6 +79,21 @@ export default function PostScreen() {
               <View style={styles.contentSection}>
                 <Text style={styles.content}>Trying out this new summer look with a floral dress and minimal accessories. Would love to hear your thoughts!</Text>
               </View>
+
+              {/* AI Feedback Card */}
+              <TouchableOpacity
+                style={styles.aiFeedbackCard}
+                onPress={() => router.push(`/ai-feedback/${postData.post_id}`)}
+              >
+                <View style={styles.aiFeedbackContent}>
+                  <FontAwesome name="magic" size={24} color="#8B44FF" style={styles.aiIcon} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.aiFeedbackTitle}>AI Style Analysis</Text>
+                    <Text style={styles.aiFeedbackSubtitle}>Get personalized fashion insights</Text>
+                  </View>
+                  <FontAwesome name="chevron-right" size={16} color="#666" />
+                </View>
+              </TouchableOpacity>
 
               {/* Reviews Section */}
               <ReviewSection 
@@ -190,5 +208,32 @@ const styles = StyleSheet.create({
     marginRight: 3,
     marginTop: 3,
     marginBottom: 3,
+  },
+  // AI Feedback Card styles
+  aiFeedbackCard: {
+    backgroundColor: '#ffffff',
+    paddingVertical: 20,
+    marginBottom: 15,
+    marginHorizontal: 15,
+    borderRadius: 12,
+  },
+  aiFeedbackContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+  },
+  aiIcon: {
+    marginRight: 12,
+  },
+  aiFeedbackTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  aiFeedbackSubtitle: {
+    fontSize: 12,
+    color: '#666',
   },
 });
