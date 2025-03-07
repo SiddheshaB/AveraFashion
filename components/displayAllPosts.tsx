@@ -303,7 +303,13 @@ export default function DisplayAllPosts() {
                     style={styles.avatar}
                   />
                   <View style={styles.userDetails}>
-                    <Text style={styles.userName}>{item.profiles.full_name}</Text>
+                    <Text 
+                      style={[styles.userName, { maxWidth: 130 }]}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {item.profiles.full_name}
+                    </Text>
                     <Text style={styles.userRole}>New Member</Text>
                   </View>
                 </View>
@@ -468,6 +474,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    marginRight: 16,
   },
   avatar: {
     width: 40,
