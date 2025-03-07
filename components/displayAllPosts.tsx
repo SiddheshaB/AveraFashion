@@ -304,13 +304,12 @@ export default function DisplayAllPosts() {
                   />
                   <View style={styles.userDetails}>
                     <Text 
-                      style={[styles.userName, { maxWidth: 130 }]}
+                      style={styles.userName}
                       numberOfLines={1}
                       ellipsizeMode="tail"
                     >
                       {item.profiles.full_name}
                     </Text>
-                    <Text style={styles.userRole}>New Member</Text>
                   </View>
                 </View>
 
@@ -477,24 +476,21 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   avatar: {
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     borderRadius: 20,
-    marginRight: 12,
+    marginRight: 5,
     backgroundColor: '#f0f0f0',
   },
   userDetails: {
+    marginLeft: 1,
     justifyContent: 'center',
   },
   userName: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 2,
-  },
-  userRole: {
-    fontSize: 13,
-    color: '#666',
+    maxWidth: 180,
   },
   statsContainer: {
     flexDirection: 'row',

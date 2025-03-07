@@ -67,7 +67,6 @@ export default function Profile() {
           style={styles.profileImage} 
         />
         <Text style={styles.name}>{users.user.user_metadata.full_name}</Text>
-        <Text style={styles.role}>New Member</Text>
         <View style={styles.xpBadge}>
           <Text style={styles.xpText}>{xpPoints} XP</Text>
         </View>
@@ -112,19 +111,19 @@ const styles = StyleSheet.create({
   },
   profileSection: {
     alignItems: "center",
-    paddingVertical: 20,
+    paddingVertical: 24,
   },
   profileImage: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   name: {
     fontSize: 24,
     fontWeight: "600",
     color: "#333",
-    marginBottom: 4,
+    marginBottom: 12,
   },
   role: {
     fontSize: 16,
@@ -133,14 +132,13 @@ const styles = StyleSheet.create({
   },
   xpBadge: {
     backgroundColor: '#4CAF50',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 16,
-    marginBottom: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 20,
   },
   xpText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
   },
   statsSection: {
