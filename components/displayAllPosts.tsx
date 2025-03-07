@@ -281,12 +281,20 @@ export default function DisplayAllPosts() {
                           source={{ uri }}
                           style={styles.image}
                         />
+                        {/* Delete Icon - Only visible in My Posts and if user is the post owner */}
+                        {selectedFilter === "my" && user?.user?.id === item.user_id && (
+                          <TouchableOpacity 
+                            style={styles.deleteButton}
+                            onPress={() => handleDeletePost(item.post_id)}
+                          >
+                            <FontAwesome name="trash" size={14} color="#FF4757" />
+                          </TouchableOpacity>
+                        )}
                       </TouchableOpacity>
                     ))}
                   </Swiper>
                 </View>
               )}
-
               {/* Profile and Review Section */}
               <View style={styles.bottomSection}>
                 <View style={styles.userInfo}>
@@ -325,16 +333,6 @@ export default function DisplayAllPosts() {
                     </TouchableOpacity>
                   )}
                 </View>
-
-                {/* Delete Icon - Only visible in My Posts and if user is the post owner */}
-                {selectedFilter === "my" && user?.user?.id === item.user_id && (
-                  <TouchableOpacity 
-                    style={styles.deleteButton}
-                    onPress={() => handleDeletePost(item.post_id)}
-                  >
-                    <FontAwesome name="trash" size={20} color="#e0e0e0" />
-                  </TouchableOpacity>
-                )}
               </View>
             </View>
           )}
@@ -423,6 +421,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     width: Dimensions.get('window').width - 24,
     overflow: 'hidden',
+    position: 'relative',
   },
   // Image section styles
   imageSection: {
@@ -433,11 +432,28 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    position: 'relative',
   },
   image: {
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
+  },
+  deleteButton: {
+    position: 'absolute',
+    bottom: 12,
+    right: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 4,
   },
   // Profile and Review Section
   bottomSection: {
@@ -501,10 +517,6 @@ const styles = StyleSheet.create({
     color: '#666',
     marginLeft: 6,
     fontWeight: '500',
-  },
-  // Delete button styles
-  deleteButton: {
-    padding: 8,
   },
   // Swiper styles
   dotStyle: {
