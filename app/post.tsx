@@ -6,7 +6,7 @@
  * - Post description
  * - Reviews section
  */
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import ReviewSection from '../components/ReviewSection';
 import { FontAwesome } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
+import ImageViewer from '../components/ImageViewer';
 
 export default function PostScreen() {
   // Get post data from URL parameters and parse JSON
@@ -32,6 +33,8 @@ export default function PostScreen() {
   // Get current user from Redux store
   const user = useSelector((state: any) => state.users?.[0]?.userInfo);
   const isPostOwner = user?.user?.id === postData.user_id;
+
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // Organize post content into sections for SectionList
   const sections = [
@@ -53,13 +56,17 @@ export default function PostScreen() {
                     showsButtons={false}
                   >
                     {images.map((uri: string, index: number) => (
-                      <View key={index} style={styles.slide}>
+                      <TouchableOpacity 
+                        key={index} 
+                        style={styles.slide}
+                        onPress={() => setSelectedImage(uri)}
+                      >
                         <Image
                           source={{ uri }}
                           style={styles.image}
                           resizeMode="cover"
                         />
-                      </View>
+                      </TouchableOpacity>
                     ))}
                   </Swiper>
                 </View>
@@ -114,6 +121,11 @@ export default function PostScreen() {
                 postOwnerId={postData.user_id}
               />
             </View>
+            <ImageViewer
+              isVisible={!!selectedImage}
+              imageUrl={selectedImage || ''}
+              onClose={() => setSelectedImage(null)}
+            />
           </>
         )
       }]
