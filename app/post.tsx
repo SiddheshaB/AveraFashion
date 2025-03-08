@@ -76,7 +76,6 @@ export default function PostScreen() {
                 />
                 <View style={styles.profileInfo}>
                   <Text style={styles.fullName}>{postData.profiles.full_name}</Text>
-                  <Text style={styles.userRole}>Style Curator</Text>
                 </View>
               </View>
 
@@ -143,37 +142,32 @@ const styles = StyleSheet.create({
   },
   // Profile Section
   profileSectionContainer: {
-    paddingTop: 20,
-    marginBottom: 15,
+    paddingTop: 16,
+    marginBottom: 12,
   },
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 15,
+    paddingHorizontal: 16,
+    paddingBottom: 12,
   },
   profileInfo: {
-    marginLeft: 12,
+    marginLeft: 8,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 35,
+    height: 35,
+    borderRadius: 18,
   },
   fullName: {
     fontSize: 14,
     fontWeight: '600',
     color: '#000',
-    marginBottom: 2,
-  },
-  userRole: {
-    fontSize: 12,
-    color: '#666',
   },
   // Content Section
   contentSection: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
   },
   content: {
     fontSize: 13,

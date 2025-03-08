@@ -212,7 +212,6 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
 
     // Check if the current user is the post owner
     if (user.user.id === postOwnerId) {
-      Alert.alert('Error', 'You cannot review your own post');
       return;
     }
 
@@ -295,7 +294,7 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
       )}
 
       {/* Write Review Section */}
-      {user && user.user.id !== postOwnerId ? (
+      {user && user.user.id !== postOwnerId && (
         <View style={styles.writeReviewBlock}>
           <Text style={styles.sectionTitle}>Write a Review</Text>
           <View style={styles.reviewStarsContainer}>
@@ -328,9 +327,12 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
             )}
           </TouchableOpacity>
         </View>
-      ) : (
+      )}
+
+      {/* Show sign in prompt only if user is not logged in */}
+      {!user && (
         <Text style={styles.signInPrompt}>
-          {!user ? "Please sign in to leave a review" : "You cannot review your own post"}
+          Please sign in to leave a review
         </Text>
       )}
 
