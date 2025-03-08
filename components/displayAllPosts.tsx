@@ -19,6 +19,10 @@ type Post = {
     full_name: string;
     avatar_url: string;
   };
+  occasion: {
+    id: string;
+    name: string;
+  };
   reviewCount: number;
   averageRating: number;
 }
@@ -68,6 +72,10 @@ export default function DisplayAllPosts() {
           profiles (
             full_name,
             avatar_url
+          ),
+          occasion (
+            id,
+            name
           )
         `)
         .order("created_at", { ascending: false });
@@ -108,6 +116,10 @@ export default function DisplayAllPosts() {
             profiles: {
               full_name: String(profiles?.full_name || ''),
               avatar_url: String(profiles?.avatar_url || '')
+            },
+            occasion: {
+              id: String(post.occasion?.id || ''),
+              name: String(post.occasion?.name || '')
             },
             reviewCount,
             averageRating

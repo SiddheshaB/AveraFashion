@@ -76,6 +76,9 @@ export default function PostScreen() {
                 />
                 <View style={styles.profileInfo}>
                   <Text style={styles.fullName}>{postData.profiles.full_name}</Text>
+                  <View style={styles.occasionCapsule}>
+                    <Text style={styles.occasionText}>{postData.occasion.name}</Text>
+                  </View>
                 </View>
               </View>
 
@@ -153,6 +156,10 @@ const styles = StyleSheet.create({
   },
   profileInfo: {
     marginLeft: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'space-between',
   },
   avatar: {
     width: 35,
@@ -163,6 +170,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#000',
+  },
+  occasionCapsule: {
+    backgroundColor: '#ECEFF1',
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    borderRadius: 4,
+  },
+  occasionText: {
+    fontSize: 11,
+    color: '#263238',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.2,
   },
   // Content Section
   contentSection: {
