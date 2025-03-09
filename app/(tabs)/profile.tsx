@@ -7,25 +7,42 @@ import { useState, useEffect } from 'react';
 import { supabase } from "../../utils/supabase";
 
 export default function Profile() {
-  // Get user info from Redux store
+  // Get user ID from Redux store
   const users = useSelector((state: any) => state.users[0].userInfo);
   const dispatch = useDispatch();
 
-  // State management for user stats and loading
+  // State management for user data and loading
+  const [userData, setUserData] = useState<any>(null);
   const [postCount, setPostCount] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [xpPoints, setXpPoints] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    // Fetch user statistics when component mounts
-    fetchUserStats().finally(() => setIsLoading(false));
+    // Fetch all user data when component mounts
+    Promise.all([fetchUserData(), fetchUserStats()])
+      .finally(() => setIsLoading(false));
   }, []);
 
   // Calculate XP points based on user activity
   const calculateXP = (posts: number, reviews: number) => {
-    // XP calculation: 10 points per post, 5 points per review
     return (posts * 10) + (reviews * 5);
+  };
+
+  // Fetch user profile data from Supabase
+  const fetchUserData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', users.user.id)
+        .single();
+
+      if (error) throw error;
+      setUserData(data);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
   };
 
   // Fetch user's posts and reviews statistics
@@ -51,7 +68,6 @@ export default function Profile() {
       
       // Calculate and set XP points
       setXpPoints(calculateXP(posts || 0, reviews || 0));
-
     } catch (error) {
       console.error('Error fetching user stats:', error);
     }
@@ -69,7 +85,7 @@ export default function Profile() {
   };
 
   // Show loading spinner while fetching data
-  if (isLoading) {
+  if (isLoading || !userData) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#724C9D" />
@@ -83,10 +99,10 @@ export default function Profile() {
       {/* Profile Header Section */}
       <View style={styles.profileSection}>
         <Image 
-          source={{ uri: users.user.user_metadata.avatar_url || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }} 
+          source={{ uri: userData.avatar_url || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }} 
           style={styles.profileImage} 
         />
-        <Text style={styles.name}>{users.user.user_metadata.full_name}</Text>
+        <Text style={styles.name}>{userData.full_name}</Text>
         <View style={styles.xpBadge}>
           <Text style={styles.xpText}>{xpPoints} XP</Text>
         </View>
