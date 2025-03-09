@@ -1,41 +1,54 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from "react-native";
-import { useSelector } from "react-redux";
-import signOut from "../../utils/signOut";
-import { useDispatch } from "react-redux";
-import { FontAwesome } from '@expo/vector-icons';
+import { View, Text, StyleSheet, Image, ActivityIndicator } from "react-native";
 import { useState, useEffect } from 'react';
-import { supabase } from "../../utils/supabase";
+import { supabase } from "../utils/supabase";
+import { useLocalSearchParams } from "expo-router";
 
-export default function Profile() {
-  // Get user info from Redux store
-  const users = useSelector((state: any) => state.users[0].userInfo);
-  const dispatch = useDispatch();
-
-  // State management for user stats and loading
+export default function PublicProfile() {
+  // Get user ID from URL parameters
+  const { id } = useLocalSearchParams();
+  
+  // State management for user data and loading states
+  const [userData, setUserData] = useState<any>(null);
   const [postCount, setPostCount] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [xpPoints, setXpPoints] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    // Fetch user statistics when component mounts
-    fetchUserStats().finally(() => setIsLoading(false));
-  }, []);
+    // Fetch user data and stats when component mounts or ID changes
+    Promise.all([fetchUserData(), fetchUserStats()])
+      .finally(() => setIsLoading(false));
+  }, [id]);
 
-  // Calculate XP points based on user activity
+  // Calculate XP based on posts and reviews
   const calculateXP = (posts: number, reviews: number) => {
-    // XP calculation: 10 points per post, 5 points per review
     return (posts * 10) + (reviews * 5);
   };
 
-  // Fetch user's posts and reviews statistics
+  // Fetch basic user profile data
+  const fetchUserData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      setUserData(data);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  // Fetch user's post and review statistics
   const fetchUserStats = async () => {
     try {
       // Get post count
       const { count: posts, error: postsError } = await supabase
         .from('posts')
         .select('*', { count: 'exact', head: true })
-        .eq('user_id', users.user.id);
+        .eq('user_id', id);
 
       if (postsError) throw postsError;
       setPostCount(posts || 0);
@@ -44,31 +57,19 @@ export default function Profile() {
       const { count: reviews, error: reviewsError } = await supabase
         .from('reviews')
         .select('*', { count: 'exact', head: true })
-        .eq('user_id', users.user.id);
+        .eq('user_id', id);
 
       if (reviewsError) throw reviewsError;
       setReviewCount(reviews || 0);
       
-      // Calculate and set XP points
+      // Update XP based on activity
       setXpPoints(calculateXP(posts || 0, reviews || 0));
-
     } catch (error) {
       console.error('Error fetching user stats:', error);
     }
   };
 
-  // Handle user logout
-  const handleLogout = () => {
-    signOut(dispatch);
-  };
-
-  // Format timestamp to date string
-  const formatDate = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return date.toISOString().split('T')[0];
-  };
-
-  // Show loading spinner while fetching data
+  // Show loading spinner while data is being fetched
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -78,21 +79,28 @@ export default function Profile() {
     );
   }
 
+  // Show error state if user data couldn't be loaded
+  if (!userData) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.errorText}>Couldn't load profile</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      {/* Profile Header Section */}
       <View style={styles.profileSection}>
         <Image 
-          source={{ uri: users.user.user_metadata.avatar_url || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }} 
+          source={{ uri: userData.avatar_url || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }} 
           style={styles.profileImage} 
         />
-        <Text style={styles.name}>{users.user.user_metadata.full_name}</Text>
+        <Text style={styles.name}>{userData.full_name}</Text>
         <View style={styles.xpBadge}>
           <Text style={styles.xpText}>{xpPoints} XP</Text>
         </View>
       </View>
 
-      {/* User Statistics Section */}
       <View style={styles.statsSection}>
         <View style={styles.statItem}>
           <Text style={styles.statNumber}>{postCount}</Text>
@@ -104,25 +112,6 @@ export default function Profile() {
           <Text style={styles.statLabel}>Reviews</Text>
         </View>
       </View>
-
-      {/* User Info Section */}
-      <View style={styles.infoSection}>
-        <View style={styles.infoItem}>
-          <FontAwesome name="envelope" size={16} color="#666" style={styles.infoIcon} />
-          <Text style={styles.infoText}>{users.user.email}</Text>
-        </View>
-        <View style={styles.infoItem}>
-          <FontAwesome name="calendar" size={16} color="#666" style={styles.infoIcon} />
-          <Text style={styles.infoText}>
-            Joined {formatDate(users.user.created_at)}
-          </Text>
-        </View>
-      </View>
-
-      {/* Sign Out Button */}
-      <TouchableOpacity style={styles.signOutButton} onPress={handleLogout}>
-        <Text style={styles.signOutText}>Sign Out</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -132,7 +121,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  // Loading state styles
+  // Loading and error states
   loadingContainer: {
     flex: 1,
     backgroundColor: "#fff",
@@ -143,6 +132,10 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 16,
     color: '#666',
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#FF4757',
   },
   // Profile section styles
   profileSection: {
@@ -198,38 +191,5 @@ const styles = StyleSheet.create({
     width: 1,
     height: '100%',
     backgroundColor: '#e0e0e0',
-  },
-  // Info section styles
-  infoSection: {
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-    backgroundColor: '#f8f8f8',
-    marginTop: 20,
-    gap: 16,
-  },
-  infoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  infoIcon: {
-    width: 24,
-    marginRight: 12,
-  },
-  infoText: {
-    fontSize: 15,
-    color: "#333",
-    flex: 1,
-  },
-  // Sign out button styles
-  signOutButton: {
-    marginTop: 30,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-  },
-  signOutText: {
-    fontSize: 16,
-    color: "#e74c3c",
-    fontWeight: '500',
-  },
+  }
 });

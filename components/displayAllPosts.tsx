@@ -173,6 +173,13 @@ export default function DisplayAllPosts() {
     );
   };
 
+  const handleProfilePress = (userId: string) => {
+    router.push({
+      pathname: '/public-profile',
+      params: { id: userId }
+    });
+  };
+
   // Filter posts based on selected filter (all posts or user's posts)
   const filteredPosts = selectedFilter === "my" && user
     ? postdata.filter(post => post.user_id === user.user.id)
@@ -309,7 +316,10 @@ export default function DisplayAllPosts() {
               )}
               {/* Profile and Review Section */}
               <View style={styles.bottomSection}>
-                <View style={styles.userInfo}>
+                <TouchableOpacity 
+                  style={styles.userInfo}
+                  onPress={() => handleProfilePress(item.user_id)}
+                >
                   <Image
                     source={{ uri: item.profiles.avatar_url }}
                     style={styles.avatar}
@@ -323,7 +333,7 @@ export default function DisplayAllPosts() {
                       {item.profiles.full_name}
                     </Text>
                   </View>
-                </View>
+                </TouchableOpacity>
 
                 <View style={styles.statsContainer}>
                   {item.reviewCount > 0 ? (

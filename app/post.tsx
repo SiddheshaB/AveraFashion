@@ -77,15 +77,21 @@ export default function PostScreen() {
             <View style={styles.profileSectionContainer}>
               {/* User Profile */}
               <View style={styles.profileSection}>
-                <Image 
-                  source={{ uri: postData.profiles.avatar_url }} 
-                  style={styles.avatar}
-                />
-                <View style={styles.profileInfo}>
+                <TouchableOpacity 
+                  style={styles.profileInfo}
+                  onPress={() => router.push({
+                    pathname: '/public-profile',
+                    params: { id: postData.user_id }
+                  })}
+                >
+                  <Image 
+                    source={{ uri: postData.profiles.avatar_url }} 
+                    style={styles.avatar}
+                  />
                   <Text style={styles.fullName}>{postData.profiles.full_name}</Text>
-                  <View style={styles.occasionCapsule}>
-                    <Text style={styles.occasionText}>{postData.occasion.name}</Text>
-                  </View>
+                </TouchableOpacity>
+                <View style={styles.occasionCapsule}>
+                  <Text style={styles.occasionText}>{postData.occasion.name}</Text>
                 </View>
               </View>
 
@@ -165,18 +171,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingBottom: 12,
+    justifyContent: 'space-between',
   },
   profileInfo: {
-    marginLeft: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
-    justifyContent: 'space-between',
   },
   avatar: {
     width: 35,
     height: 35,
     borderRadius: 18,
+    marginRight: 8,
   },
   fullName: {
     fontSize: 14,
