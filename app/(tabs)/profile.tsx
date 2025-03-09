@@ -1,10 +1,13 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, TextInput } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, TextInput, Alert } from "react-native";
 import { useSelector } from "react-redux";
 import signOut from "../../utils/signOut";
 import { useDispatch } from "react-redux";
 import { FontAwesome } from '@expo/vector-icons';
 import { useState, useEffect } from 'react';
 import { supabase } from "../../utils/supabase";
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
+import { decode } from "base64-arraybuffer";
 
 export default function Profile() {
   // Get user ID from Redux store
@@ -19,7 +22,8 @@ export default function Profile() {
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState('');
-  
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
   useEffect(() => {
     // Fetch all user data when component mounts
     Promise.all([fetchUserData(), fetchUserStats()])
@@ -86,6 +90,35 @@ export default function Profile() {
     return date.toISOString().split('T')[0];
   };
 
+  const uploadProfileImage = async (uri: string) => {
+    try {
+      const filename = `avatar-${users.user.id}.jpg`;
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: "base64",
+      });
+
+      const { data, error } = await supabase.storage
+        .from("avatars")
+        .upload(`profile/${users.user.id}/${filename}`, decode(base64), {
+          contentType: "image/jpeg",
+          upsert: true,
+        });
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(`profile/${users.user.id}/${filename}`);
+
+
+      // Add date to the url for cache busting
+      return publicUrl+`?t=${Date.now()}`;
+    } catch (error) {
+      console.error("Error uploading profile image:", error);
+      throw error;
+    }
+  };
+
   const handleUpdateName = async () => {
     if (!newName.trim()) return;
     
@@ -104,6 +137,48 @@ export default function Profile() {
     }
   };
 
+  const handleImagePick = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        Alert.alert("Permission Required", "Please allow access to your photo library to change your profile picture.");
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        setIsUploadingImage(true);
+        try {
+          const avatarUrl = await uploadProfileImage(result.assets[0].uri);
+
+          // Update profile with new avatar URL
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ avatar_url: avatarUrl })
+            .eq('id', users.user.id);
+
+          if (updateError) throw updateError;
+
+          // Update local state
+          setUserData({ ...userData, avatar_url: avatarUrl });
+        } catch (error) {
+          console.error('Error uploading image:', error);
+          Alert.alert('Error', 'Failed to update profile picture. Please try again.');
+        }
+        setIsUploadingImage(false);
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      Alert.alert('Error', 'Failed to pick image. Please try again.');
+    }
+  };
+
   // Show loading spinner while fetching data
   if (isLoading || !userData) {
     return (
@@ -118,10 +193,26 @@ export default function Profile() {
     <View style={styles.container}>
       {/* Profile Header Section */}
       <View style={styles.profileSection}>
-        <Image 
-          source={{ uri: userData.avatar_url || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }} 
-          style={styles.profileImage} 
-        />
+        <TouchableOpacity 
+          onPress={handleImagePick}
+          activeOpacity={0.8}
+          style={styles.profileImageContainer}
+        >
+          <Image 
+            source={{ 
+              uri: userData.avatar_url || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y',
+            }} 
+            style={styles.profileImage} 
+          />
+          {isUploadingImage && (
+            <View style={styles.uploadingOverlay}>
+              <ActivityIndicator color="#fff" />
+            </View>
+          )}
+          <View style={styles.editImageOverlay}>
+            <Text style={styles.editImageText}>Change Photo</Text>
+          </View>
+        </TouchableOpacity>
         {isEditing ? (
           <View style={styles.editNameContainer}>
             <TextInput
@@ -213,11 +304,37 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 24,
   },
+  profileImageContainer: {
+    position: 'relative',
+    marginBottom: 20,
+  },
   profileImage: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    marginBottom: 20,
+  },
+  uploadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editImageOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingVertical: 4,
+    borderBottomLeftRadius: 60,
+    borderBottomRightRadius: 60,
+  },
+  editImageText: {
+    color: '#fff',
+    fontSize: 12,
+    textAlign: 'center',
+    fontWeight: '500',
   },
   editNameContainer: {
     alignItems: 'center',
