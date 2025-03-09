@@ -44,16 +44,16 @@ export default function TabLayout() {
         console.error("Error retrieving session:", error.message);
       } else if (session) {
         setUser(session);
-    
-      
         dispatch(setUserInfo(session));
-       
       } else {
         console.log("No session found.");
-        
       }
-      setLoading(false);
+      // Add a small delay before hiding splash screen
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     };
+
     // Listen to auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
@@ -71,10 +71,24 @@ export default function TabLayout() {
       authListener.subscription.unsubscribe();
     };
   }, []);
+
+  if (loading) {
+    return (
+      <View style={{ 
+        flex: 1, 
+        backgroundColor: '#724C9D',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        {/* Empty splash screen for now */}
+      </View>
+    );
+  }
+
   return (
-    <View style={{ flex: 1, }}>
+    <View style={{ flex: 1 }}>
       {!user ? (
-        <Login></Login> //if user is not  signed-in, Sign-in button will appear
+        <Login /> //if user is not signed-in, Sign-in button will appear
       ) : (
         // if user is already signed-in, Homescreen and other tabs will appear
         <Tabs
