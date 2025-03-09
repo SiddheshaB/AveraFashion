@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, TextInput } from "react-native";
 import { useSelector } from "react-redux";
 import signOut from "../../utils/signOut";
 import { useDispatch } from "react-redux";
@@ -17,6 +17,8 @@ export default function Profile() {
   const [reviewCount, setReviewCount] = useState(0);
   const [xpPoints, setXpPoints] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newName, setNewName] = useState('');
   
   useEffect(() => {
     // Fetch all user data when component mounts
@@ -84,6 +86,24 @@ export default function Profile() {
     return date.toISOString().split('T')[0];
   };
 
+  const handleUpdateName = async () => {
+    if (!newName.trim()) return;
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ full_name: newName.trim() })
+        .eq('id', users.user.id);
+
+      if (error) throw error;
+      
+      setUserData({ ...userData, full_name: newName.trim() });
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating name:', error);
+    }
+  };
+
   // Show loading spinner while fetching data
   if (isLoading || !userData) {
     return (
@@ -102,7 +122,35 @@ export default function Profile() {
           source={{ uri: userData.avatar_url || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }} 
           style={styles.profileImage} 
         />
-        <Text style={styles.name}>{userData.full_name}</Text>
+        {isEditing ? (
+          <View style={styles.editNameContainer}>
+            <TextInput
+              style={styles.nameInput}
+              value={newName}
+              onChangeText={setNewName}
+              placeholder="Enter new name"
+              autoFocus
+            />
+            <View style={styles.editButtonsRow}>
+              <TouchableOpacity style={styles.editButton} onPress={handleUpdateName}>
+                <Text style={styles.editButtonText}>Save</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.editButton, styles.cancelButton]} onPress={() => setIsEditing(false)}>
+                <Text style={styles.editButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          <TouchableOpacity 
+            onPress={() => {
+              setNewName(userData.full_name);
+              setIsEditing(true);
+            }}
+            activeOpacity={0.6}
+          >
+            <Text style={styles.name}>{userData.full_name}</Text>
+          </TouchableOpacity>
+        )}
         <View style={styles.xpBadge}>
           <Text style={styles.xpText}>{xpPoints} XP</Text>
         </View>
@@ -170,6 +218,38 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     marginBottom: 20,
+  },
+  editNameContainer: {
+    alignItems: 'center',
+    marginBottom: 12,
+    width: '80%',
+  },
+  nameInput: {
+    borderWidth: 1,
+    borderColor: '#724C9D',
+    borderRadius: 8,
+    padding: 8,
+    fontSize: 18,
+    width: '100%',
+    marginBottom: 8,
+  },
+  editButtonsRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  editButton: {
+    backgroundColor: '#724C9D',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  cancelButton: {
+    backgroundColor: '#666',
+  },
+  editButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   name: {
     fontSize: 24,
