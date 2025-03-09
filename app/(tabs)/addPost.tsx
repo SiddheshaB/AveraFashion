@@ -436,8 +436,8 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   uploadContainer: {
-    width: "100%",
-    height: 200,
+    width: 300,
+    height: 300,
     borderWidth: 2,
     borderColor: "#E4E4E7",
     borderStyle: "dashed",
@@ -460,8 +460,8 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   imageContainer: {
-    width: "100%",
-    height: 200,
+    width: 300,
+    height: 300,
     borderRadius: 8,
     overflow: "hidden",
   },
@@ -485,7 +485,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   swiper: {
-    height: 200,
+    height: 300,
   },
   slide: {
     flex: 1,
