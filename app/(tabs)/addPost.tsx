@@ -62,7 +62,7 @@ export default function AddPost() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [occasions, setOccasions] = useState<Array<{ id: number; name: string }>>([]);
-  const [selectedOccasion, setSelectedOccasion] = useState<string>("");
+  const [selectedOccasion, setSelectedOccasion] = useState<number | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [dropdownLayout, setDropdownLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
@@ -93,7 +93,7 @@ export default function AddPost() {
   };
 
   // Enable submit button only when required fields are filled
-  const isSubmitEnabled = selectedOccasion !== "" && imageUri.length > 0;
+  const isSubmitEnabled = selectedOccasion !== null && imageUri.length > 0;
 
   // Fetch occasions from Supabase
   useEffect(() => {
@@ -138,6 +138,11 @@ export default function AddPost() {
 
   // Handle form submission and data upload
   const postData = async () => {
+    if (!selectedOccasion) {
+      // Handle error - occasion must be selected
+      return;
+    }
+    
     // Upload images to Supabase storage
     const supabaseDownloadURL = await uploadToSupabase(imageUri);
     console.log("supabase download img: ", supabaseDownloadURL);
@@ -149,7 +154,7 @@ export default function AddPost() {
     setTitle('');
     setContent('');
     setImageUri('');
-    setSelectedOccasion('');
+    setSelectedOccasion(null);
   };
 
   // Close dropdown when clicking outside
@@ -189,9 +194,9 @@ export default function AddPost() {
             >
               <Text style={[
                 styles.occasionText,
-                selectedOccasion ? { color: '#333' } : undefined
+                selectedOccasion !== null ? { color: '#333' } : undefined
               ]}>
-                {selectedOccasion || "Choose an occasion"}
+                {selectedOccasion !== null ? occasions.find((occasion) => occasion.id === selectedOccasion).name : "Choose an occasion"}
               </Text>
               <AntDesign 
                 name={isDropdownOpen ? "caretup" : "caretdown"} 
@@ -228,16 +233,16 @@ export default function AddPost() {
                           <TouchableOpacity
                             style={[
                               styles.dropdownItem,
-                              selectedOccasion === item.name && styles.selectedItem
+                              selectedOccasion === item.id && styles.selectedItem
                             ]}
                             onPress={() => {
-                              setSelectedOccasion(item.name);
+                              setSelectedOccasion(item.id);
                               setIsDropdownOpen(false);
                             }}
                           >
                             <Text style={[
                               styles.dropdownItemText,
-                              selectedOccasion === item.name && styles.selectedItemText
+                              selectedOccasion === item.id && styles.selectedItemText
                             ]}>
                               {item.name}
                             </Text>
@@ -431,8 +436,8 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   uploadContainer: {
-    width: "100%",
-    height: 200,
+    width: 300,
+    height: 300,
     borderWidth: 2,
     borderColor: "#E4E4E7",
     borderStyle: "dashed",
@@ -455,8 +460,8 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   imageContainer: {
-    width: "100%",
-    height: 200,
+    width: 300,
+    height: 300,
     borderRadius: 8,
     overflow: "hidden",
   },
@@ -480,7 +485,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   swiper: {
-    height: 200,
+    height: 300,
   },
   slide: {
     flex: 1,

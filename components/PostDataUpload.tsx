@@ -4,7 +4,7 @@ export const postDataUpload = async (
   title: any,
   content: any,
   supabaseUrl: any,
-  occasion: string
+  occasionId: number
 ) => {
   try {
     const { data, error } = await supabase
@@ -14,11 +14,12 @@ export const postDataUpload = async (
         image_url: supabaseUrl,
         user_id: (await supabase.auth.getSession()).data.session.user.id,
         content: content,
-        occasion: occasion,
+        occasion: occasionId,
       });
     console.log(data);
 
     if (error) throw error;
+    return data;
   } catch (error) {
     console.error("Error uploading data to Supabase table:", error);
     throw error;

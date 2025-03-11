@@ -19,6 +19,10 @@ type Post = {
     full_name: string;
     avatar_url: string;
   };
+  occasion: {
+    id: string;
+    name: string;
+  };
   reviewCount: number;
   averageRating: number;
 }
@@ -68,6 +72,10 @@ export default function DisplayAllPosts() {
           profiles (
             full_name,
             avatar_url
+          ),
+          occasion (
+            id,
+            name
           )
         `)
         .order("created_at", { ascending: false });
@@ -108,6 +116,10 @@ export default function DisplayAllPosts() {
             profiles: {
               full_name: String(profiles?.full_name || ''),
               avatar_url: String(profiles?.avatar_url || '')
+            },
+            occasion: {
+              id: String(post.occasion?.id || ''),
+              name: String(post.occasion?.name || '')
             },
             reviewCount,
             averageRating
@@ -159,6 +171,13 @@ export default function DisplayAllPosts() {
         }
       ]
     );
+  };
+
+  const handleProfilePress = (userId: string) => {
+    router.push({
+      pathname: '/public-profile',
+      params: { id: userId }
+    });
   };
 
   // Filter posts based on selected filter (all posts or user's posts)
@@ -281,24 +300,40 @@ export default function DisplayAllPosts() {
                           source={{ uri }}
                           style={styles.image}
                         />
+                        {/* Delete Icon - Only visible in My Posts and if user is the post owner */}
+                        {selectedFilter === "my" && user?.user?.id === item.user_id && (
+                          <TouchableOpacity 
+                            style={styles.deleteButton}
+                            onPress={() => handleDeletePost(item.post_id)}
+                          >
+                            <FontAwesome name="trash" size={14} color="#FF4757" />
+                          </TouchableOpacity>
+                        )}
                       </TouchableOpacity>
                     ))}
                   </Swiper>
                 </View>
               )}
-
               {/* Profile and Review Section */}
               <View style={styles.bottomSection}>
-                <View style={styles.userInfo}>
+                <TouchableOpacity 
+                  style={styles.userInfo}
+                  onPress={() => handleProfilePress(item.user_id)}
+                >
                   <Image
                     source={{ uri: item.profiles.avatar_url }}
                     style={styles.avatar}
                   />
                   <View style={styles.userDetails}>
-                    <Text style={styles.userName}>{item.profiles.full_name}</Text>
-                    <Text style={styles.userRole}>New Member</Text>
+                    <Text 
+                      style={styles.userName}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {item.profiles.full_name}
+                    </Text>
                   </View>
-                </View>
+                </TouchableOpacity>
 
                 <View style={styles.statsContainer}>
                   {item.reviewCount > 0 ? (
@@ -325,16 +360,6 @@ export default function DisplayAllPosts() {
                     </TouchableOpacity>
                   )}
                 </View>
-
-                {/* Delete Icon - Only visible in My Posts and if user is the post owner */}
-                {selectedFilter === "my" && user?.user?.id === item.user_id && (
-                  <TouchableOpacity 
-                    style={styles.deleteButton}
-                    onPress={() => handleDeletePost(item.post_id)}
-                  >
-                    <FontAwesome name="trash" size={20} color="#e0e0e0" />
-                  </TouchableOpacity>
-                )}
               </View>
             </View>
           )}
@@ -423,6 +448,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     width: Dimensions.get('window').width - 24,
     overflow: 'hidden',
+    position: 'relative',
   },
   // Image section styles
   imageSection: {
@@ -433,11 +459,28 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    position: 'relative',
   },
   image: {
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
+  },
+  deleteButton: {
+    position: 'absolute',
+    bottom: 12,
+    right: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 4,
   },
   // Profile and Review Section
   bottomSection: {
@@ -452,26 +495,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    marginRight: 16,
   },
   avatar: {
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     borderRadius: 20,
-    marginRight: 12,
+    marginRight: 5,
     backgroundColor: '#f0f0f0',
   },
   userDetails: {
+    marginLeft: 1,
     justifyContent: 'center',
   },
   userName: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 2,
-  },
-  userRole: {
-    fontSize: 13,
-    color: '#666',
+    maxWidth: 180,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -501,10 +542,6 @@ const styles = StyleSheet.create({
     color: '#666',
     marginLeft: 6,
     fontWeight: '500',
-  },
-  // Delete button styles
-  deleteButton: {
-    padding: 8,
   },
   // Swiper styles
   dotStyle: {

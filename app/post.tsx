@@ -6,7 +6,7 @@
  * - Post description
  * - Reviews section
  */
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -14,16 +14,27 @@ import {
   StyleSheet,
   Dimensions,
   SectionList,
+  TouchableOpacity,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import ReviewSection from '../components/ReviewSection';
+import { FontAwesome } from '@expo/vector-icons';
+import { useSelector } from 'react-redux';
+import ImageViewer from '../components/ImageViewer';
 
 export default function PostScreen() {
   // Get post data from URL parameters and parse JSON
   const { post } = useLocalSearchParams();
+  const router = useRouter();
   const postData = JSON.parse(post as string);
   const images = JSON.parse(postData.image_url);
+  
+  // Get current user from Redux store
+  const user = useSelector((state: any) => state.users?.[0]?.userInfo);
+  const isPostOwner = user?.user?.id === postData.user_id;
+
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // Organize post content into sections for SectionList
   const sections = [
@@ -45,13 +56,17 @@ export default function PostScreen() {
                     showsButtons={false}
                   >
                     {images.map((uri: string, index: number) => (
-                      <View key={index} style={styles.slide}>
+                      <TouchableOpacity 
+                        key={index} 
+                        style={styles.slide}
+                        onPress={() => setSelectedImage(uri)}
+                      >
                         <Image
                           source={{ uri }}
                           style={styles.image}
                           resizeMode="cover"
                         />
-                      </View>
+                      </TouchableOpacity>
                     ))}
                   </Swiper>
                 </View>
@@ -62,20 +77,49 @@ export default function PostScreen() {
             <View style={styles.profileSectionContainer}>
               {/* User Profile */}
               <View style={styles.profileSection}>
-                <Image 
-                  source={{ uri: postData.profiles.avatar_url }} 
-                  style={styles.avatar}
-                />
-                <View style={styles.profileInfo}>
+                <TouchableOpacity 
+                  style={styles.profileInfo}
+                  onPress={() => router.push({
+                    pathname: '/public-profile',
+                    params: { id: postData.user_id }
+                  })}
+                >
+                  <Image 
+                    source={{ uri: postData.profiles.avatar_url }} 
+                    style={styles.avatar}
+                  />
                   <Text style={styles.fullName}>{postData.profiles.full_name}</Text>
-                  <Text style={styles.userRole}>Style Curator</Text>
+                </TouchableOpacity>
+                <View style={styles.occasionCapsule}>
+                  <Text style={styles.occasionText}>{postData.occasion.name}</Text>
                 </View>
               </View>
 
               {/* Post Description */}
               <View style={styles.contentSection}>
-                <Text style={styles.content}>Trying out this new summer look with a floral dress and minimal accessories. Would love to hear your thoughts!</Text>
+                <Text style={styles.content}>{postData.content}</Text>
               </View>
+
+              {/* AI Feedback Card - Only visible to post owner */}
+              {isPostOwner && (
+                <TouchableOpacity
+                  style={styles.aiFeedbackCard}
+                  onPress={() => router.push({
+                    pathname: '/ai-feedback',
+                    params: { id: postData.post_id }
+                  })}
+                >
+                  <View style={styles.aiFeedbackContent}>
+                    <FontAwesome name="magic" size={24} color="#8B44FF" style={styles.aiIcon} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.aiFeedbackTitle}>AI Style Analysis</Text>
+                      <Text style={styles.aiFeedbackSubtitle}>Get personalized fashion insights</Text>
+                      <Text style={styles.ownerOnlyText}>Only visible to you</Text>
+                    </View>
+                    <FontAwesome name="chevron-right" size={16} color="#666" />
+                  </View>
+                </TouchableOpacity>
+              )}
 
               {/* Reviews Section */}
               <ReviewSection 
@@ -83,6 +127,11 @@ export default function PostScreen() {
                 postOwnerId={postData.user_id}
               />
             </View>
+            <ImageViewer
+              isVisible={!!selectedImage}
+              imageUrl={selectedImage || ''}
+              onClose={() => setSelectedImage(null)}
+            />
           </>
         )
       }]
@@ -114,37 +163,48 @@ const styles = StyleSheet.create({
   },
   // Profile Section
   profileSectionContainer: {
-    paddingTop: 20,
-    marginBottom: 15,
+    paddingTop: 16,
+    marginBottom: 12,
   },
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 15,
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    justifyContent: 'space-between',
   },
   profileInfo: {
-    marginLeft: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 35,
+    height: 35,
+    borderRadius: 18,
+    marginRight: 8,
   },
   fullName: {
     fontSize: 14,
     fontWeight: '600',
     color: '#000',
-    marginBottom: 2,
   },
-  userRole: {
-    fontSize: 12,
-    color: '#666',
+  occasionCapsule: {
+    backgroundColor: '#ECEFF1',
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    borderRadius: 4,
+  },
+  occasionText: {
+    fontSize: 11,
+    color: '#263238',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.2,
   },
   // Content Section
   contentSection: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
   },
   content: {
     fontSize: 13,
@@ -190,5 +250,38 @@ const styles = StyleSheet.create({
     marginRight: 3,
     marginTop: 3,
     marginBottom: 3,
+  },
+  // AI Feedback Card styles
+  aiFeedbackCard: {
+    backgroundColor: '#ffffff',
+    paddingVertical: 20,
+    marginBottom: 15,
+    marginHorizontal: 15,
+    borderRadius: 12,
+  },
+  aiFeedbackContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+  },
+  aiIcon: {
+    marginRight: 12,
+  },
+  aiFeedbackTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  aiFeedbackSubtitle: {
+    fontSize: 12,
+    color: '#666',
+  },
+  ownerOnlyText: {
+    fontSize: 11,
+    color: '#8B44FF',
+    marginTop: 4,
+    fontWeight: '500',
   },
 });
