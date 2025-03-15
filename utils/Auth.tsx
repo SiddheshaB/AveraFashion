@@ -8,6 +8,7 @@ import { View, StyleSheet, TouchableOpacity, Text, AppState } from "react-native
 import { useDispatch } from "react-redux";
 import { setActiveUser, setUserInfo } from "../store/users";
 import { router } from "expo-router";
+import { saveFCMToken } from "../utils/fcmToken";
 
 AppState.addEventListener("change", (state) => {
   if (state === "active") {
@@ -39,6 +40,11 @@ export default function GoogleLogin() {
           provider: "google",
           token: userInfo.data.idToken,
         });
+        console.log("User logged in successfully.");
+        if (data.user?.id) {
+          await saveFCMToken(data.user.id);
+          console.log("FCM token saved.");
+      }
         if (error) throw error;
         dispatch(setUserInfo(data));
         //dispatch(setActiveUser(true));
