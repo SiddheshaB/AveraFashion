@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
   },
   // Pagination Dots
   dot: {
-    backgroundColor: 'rgba(0,0,0,.2)',
+    backgroundColor: 'rgba(255,255,255,0.5)',
     width: 6,
     height: 6,
     borderRadius: 3,
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   activeDot: {
-    backgroundColor: '#000',
+    backgroundColor: '#FFFFFF',
     width: 6,
     height: 6,
     borderRadius: 3,

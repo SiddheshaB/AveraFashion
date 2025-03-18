@@ -8,6 +8,7 @@ import { supabase } from "../../utils/supabase";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import { decode } from "base64-arraybuffer";
+import { Linking } from 'react-native';
 
 export default function Profile() {
   // Get user ID from Redux store
@@ -272,6 +273,14 @@ export default function Profile() {
             Joined {formatDate(users.user.created_at)}
           </Text>
         </View>
+        <TouchableOpacity 
+          style={styles.infoItem}
+          onPress={() => Linking.openURL('mailto:connect.avera@gmail.com')}
+        >
+          <FontAwesome name="comment-o" size={16} color="#666" style={styles.infoIcon} />
+          <Text style={styles.infoText}>Contact Support</Text>
+          <FontAwesome name="chevron-right" size={14} color="#999" style={{ marginLeft: 'auto' }} />
+        </TouchableOpacity>
       </View>
 
       {/* Sign Out Button */}
