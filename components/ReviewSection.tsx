@@ -357,7 +357,7 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
                         </Text>
                       </View>
                       <StarRating rating={item.rating} size={16} />
-                      {(postOwnerId === user?.user?.id || item.user_id === user?.user?.id) && (
+                      {item.user_id === user?.user?.id && (
                         <TouchableOpacity
                           style={styles.deleteButton}
                           onPress={() => deleteReview(item.id)}
