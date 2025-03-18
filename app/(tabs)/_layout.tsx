@@ -6,6 +6,7 @@ import Login from "../sign_in";
 import { useEffect, useState } from "react";
 import { supabase } from "../../utils/supabase";
 import { setActiveUser, setUserInfo } from "../../store/users";
+import SplashScreen from '../../components/SplashScreen';
 
 export default function TabLayout() {
   const [user, setUser] = useState<any>(null);
@@ -73,16 +74,7 @@ export default function TabLayout() {
   }, []);
 
   if (loading) {
-    return (
-      <View style={{ 
-        flex: 1, 
-        backgroundColor: '#724C9D',
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}>
-        {/* Empty splash screen for now */}
-      </View>
-    );
+    return <SplashScreen />;
   }
 
   return (
@@ -96,7 +88,7 @@ export default function TabLayout() {
             tabBarActiveTintColor: "#724C9D",
             tabBarInactiveTintColor:"#aaa2d8",
             tabBarShowLabel: false,
-            headerTitle: "StyleMe",
+            headerTitle: "Avera",
             headerShown: false,
             tabBarStyle: {
               display: isKeyboardVisible ? 'none' : 'flex',

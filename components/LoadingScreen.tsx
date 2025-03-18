@@ -10,7 +10,7 @@ export default function LoadingScreen() {
     >
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#333" />
-        <Text style={styles.loadingText}>Loading StyleMe...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     </LinearGradient>
   );

@@ -8,6 +8,7 @@ import { View, StyleSheet, TouchableOpacity, Text, AppState } from "react-native
 import { useDispatch } from "react-redux";
 import { setActiveUser, setUserInfo } from "../store/users";
 import { router } from "expo-router";
+import { FontAwesome } from '@expo/vector-icons';
 
 AppState.addEventListener("change", (state) => {
   if (state === "active") {
@@ -58,41 +59,44 @@ export default function GoogleLogin() {
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity 
-        style={styles.googleButton}
-        onPress={handleGoogleSignIn}
-      >
-        <Text style={styles.googleButtonText}>Sign in with Google</Text>
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity
+      style={styles.googleButton}
+      onPress={handleGoogleSignIn}
+      activeOpacity={0.8}
+    >
+      <View style={styles.buttonContent}>
+        <FontAwesome name="google" size={22} color="#4285F4" style={styles.googleIcon} />
+        <Text style={styles.buttonText}>Continue with Google</Text>
+      </View>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-  },
   googleButton: {
-    backgroundColor: '#000000',
+    backgroundColor: '#ffffff',
     paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 25,
+    paddingHorizontal: 24,
+    borderRadius: 30,
+    width: '80%',
+    maxWidth: 300,
     elevation: 3,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
-  googleButtonText: {
-    color: '#ffffff',
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  googleIcon: {
+    marginRight: 12,
+  },
+  buttonText: {
+    color: '#333333',
     fontSize: 16,
     fontWeight: '600',
-    textAlign: 'center',
   },
 });
