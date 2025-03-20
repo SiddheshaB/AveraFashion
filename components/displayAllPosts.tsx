@@ -263,6 +263,12 @@ export default function DisplayAllPosts() {
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#333" />
         </View>
+      ) : filteredPosts.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>
+            {selectedFilter === "my" ? "You don't have any posts" : "No posts available"}
+          </Text>
+        </View>
       ) : (
         <FlatList
           data={filteredPosts}
@@ -339,11 +345,11 @@ export default function DisplayAllPosts() {
                   {item.reviewCount > 0 ? (
                     <>
                       <View style={styles.stat}>
-                        <FontAwesome name="star" size={16} color="#FFD700" />
+                        <FontAwesome name="star-o" size={16} color="#FFD700" />
                         <Text style={styles.statText}>{item.averageRating.toFixed(1)}</Text>
                       </View>
                       <View style={styles.stat}>
-                        <FontAwesome name="comment" size={16} color="#666" />
+                        <FontAwesome name="comment-o" size={16} color="#8B44FF" />
                         <Text style={styles.statText}>{item.reviewCount}</Text>
                       </View>
                     </>
@@ -584,5 +590,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     backgroundColor: '#f8f8f8',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f8f8f8',
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#d3d3d3',
+    textAlign: 'center',
   },
 });

@@ -1,8 +1,35 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import {
+  useFonts,
+  Sofia_400Regular,
+} from '@expo-google-fonts/sofia';
+
+const { width } = Dimensions.get('window');
 
 export default function SplashScreen() {
+  const [fontsLoaded] = useFonts({
+    Sofia_400Regular,
+  });
+
+ /*  if (!fontsLoaded) {
+    return (
+      <LinearGradient
+        colors={['#724C9D', '#8b63b5', '#a47acd']}
+        style={styles.container}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={styles.contentContainer}>
+          <Text style={[styles.title, { fontFamily: 'Sofia_400Regular' }]}>AVERA</Text>
+          <View style={styles.decorativeLine} />
+          <Text style={[styles.subtitle, { fontFamily: undefined }]}>Style Your Way</Text>
+        </View>
+      </LinearGradient>
+    );
+  } */
+
   return (
     <LinearGradient
       colors={['#724C9D', '#8b63b5', '#a47acd']}
@@ -11,15 +38,13 @@ export default function SplashScreen() {
       end={{ x: 1, y: 1 }}
     >
       <View style={styles.contentContainer}>
-        <Text style={styles.title}>AVERA</Text>
-        <Text style={styles.subtitle}>Style Your Story</Text>
+        <Text style={styles.title}>Avera</Text>
         <View style={styles.decorativeLine} />
+        <Text style={styles.subtitle}>Style Your Way</Text>
       </View>
     </LinearGradient>
   );
 }
-
-const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
@@ -29,32 +54,36 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     alignItems: 'center',
-    transform: [{ translateY: -30 }], // Slight upward shift for better visual balance
+    justifyContent: 'center',
+    padding: 20,
+    marginTop: 20,
   },
   title: {
-    fontSize: width * 0.15, // Responsive font size
-    fontWeight: '800',
+    fontSize: width * 0.15,
     color: '#ffffff',
     letterSpacing: 12,
-    textTransform: 'uppercase',
+    // textTransform: 'uppercase' as const,
     marginBottom: 15,
     textShadowColor: 'rgba(0, 0, 0, 0.2)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 4,
+    fontFamily: 'Sofia_400Regular',
   },
   subtitle: {
-    fontSize: width * 0.045, // Responsive font size
+    fontSize: width * 0.045,
     color: '#ffffff',
     letterSpacing: 4,
     opacity: 0.9,
-    fontWeight: '300',
-    textTransform: 'uppercase',
+    fontWeight: '300' as const,
+    textTransform: 'uppercase' as const,
     marginBottom: 20,
+    //fontFamily: 'Sofia_400Regular',
   },
   decorativeLine: {
     width: width * 0.3,
     height: 2,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    marginTop: 20,
+    backgroundColor: '#ffffff',
+    marginVertical: 10,
+    opacity: 0.7,
   },
 });

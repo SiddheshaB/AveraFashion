@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   xpBadge: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: 'rgba(139, 68, 255, 0.5)',
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 20,
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
   },
   signOutText: {
     fontSize: 16,
-    color: "#e74c3c",
+    color: "#8B44FF",
     fontWeight: '500',
   },
 });

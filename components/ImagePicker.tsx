@@ -16,7 +16,7 @@ export default async function pickImage(setImageUri: any, imageUri: string[]) {
   }
 
   let result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ["images", "videos"],
+    mediaTypes: ["images"],
     allowsEditing: false,
     aspect: [4, 3],
     quality: 1,

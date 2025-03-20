@@ -23,7 +23,7 @@ import { supabase } from "../../utils/supabase";
 
 // Maximum number of images that can be uploaded
 const MAX_IMAGES = 3;
-
+const MAX_CHARS = 200;
 // Handle image selection from device library
 const pickImage = async (setImageUri:any, imageUri:any) => {
   // Request permission to access media library
@@ -300,16 +300,21 @@ export default function AddPost() {
 
           {/* Description Input */}
           <Text style={styles.sectionTitle}>Description</Text>
+          <View style={styles.inputContainer}>
           <TextInput
             editable
             multiline
-            numberOfLines={4}
+            //numberOfLines={4}
+            maxLength={MAX_CHARS}
             placeholder="Tell us about your outfit and get personalized feedback..."
             style={styles.postContent}
             onChangeText={(text) => setContent(text)}
             value={content}
           />
-
+          <Text style={styles.charCount}>
+          {MAX_CHARS - content.length} characters remaining
+          </Text>
+          </View>
           {/* Submit Button */}
           <GradientButton 
             onPress={postData} 
@@ -475,8 +480,8 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   postContent: {
-    width: "100%",
-    minHeight: 120,
+    width: 350,
+    height: 120,
     borderWidth: 1,
     borderColor: "#E4E4E7",
     borderRadius: 8,
@@ -515,5 +520,15 @@ const styles = StyleSheet.create({
   },
   pagination: {
     bottom: 10,
+  },
+  charCount: {
+    fontSize: 12,
+    color: '#666',
+    textAlign: 'right',
+  },
+  inputContainer: {
+    flexDirection: "column",
+    marginBottom: 16,
+    flex: 1,
   },
 });

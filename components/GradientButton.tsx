@@ -26,10 +26,10 @@ const styles= StyleSheet.create({
         paddingHorizontal: 24,
         width: "100%",
         alignItems: "center",
-        backgroundColor:"#333",
+        backgroundColor:"#8B44FF",
     },
     buttonDisabled: {
-        backgroundColor: "#999",
+        backgroundColor: 'rgba(139, 68, 255, 0.5)',
         opacity: 0.7,
     },
     buttonText: {
