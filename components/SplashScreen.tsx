@@ -61,13 +61,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: width * 0.15,
     color: '#ffffff',
-    letterSpacing: 12,
+    letterSpacing: 4,
     // textTransform: 'uppercase' as const,
     marginBottom: 15,
     textShadowColor: 'rgba(0, 0, 0, 0.2)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 4,
     fontFamily: 'Sofia_400Regular',
+    width: width * 0.9,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: width * 0.045,
