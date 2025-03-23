@@ -2,9 +2,20 @@ import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from "react-nati
 import LoginButton from "../utils/Auth";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import {
+  useFonts,
+  Sofia_400Regular,
+} from '@expo-google-fonts/sofia';
 
 export default function SignIn() {
   const router = useRouter();
+  const [fontsLoaded] = useFonts({
+    Sofia_400Regular,
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <LinearGradient
@@ -14,7 +25,7 @@ export default function SignIn() {
       end={{ x: 1, y: 1 }}
     >
       <View style={styles.contentContainer}>
-        <Text style={styles.title}>AVERA</Text>
+        <Text style={[styles.title, { fontFamily: 'Sofia_400Regular' }]}>Avera</Text>
         <Text style={styles.subtitle}>Style Your Story</Text>
         <View style={styles.loginContainer}>
           <Text style={styles.welcomeText}>Welcome</Text>
@@ -51,10 +62,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: width * 0.15,
-    fontWeight: '800',
     color: '#ffffff',
     letterSpacing: 12,
-    textTransform: 'uppercase',
     marginBottom: 15,
     textShadowColor: 'rgba(0, 0, 0, 0.2)',
     textShadowOffset: { width: 2, height: 2 },
