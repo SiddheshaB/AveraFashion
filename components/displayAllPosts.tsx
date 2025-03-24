@@ -349,7 +349,7 @@ export default function DisplayAllPosts() {
                         <Text style={styles.statText}>{item.averageRating.toFixed(1)}</Text>
                       </View>
                       <View style={styles.stat}>
-                        <FontAwesome name="comment-o" size={16} color="#8B44FF" />
+                        <FontAwesome name="comment-o" size={16} color="#724C9D" />
                         <Text style={styles.statText}>{item.reviewCount}</Text>
                       </View>
                     </>

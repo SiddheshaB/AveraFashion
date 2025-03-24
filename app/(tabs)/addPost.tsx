@@ -313,8 +313,7 @@ export default function AddPost() {
           />
           <Text style={styles.charCount}>
           {MAX_CHARS - content.length} characters remaining
-          </Text>
-          </View>
+          </Text></View>
           {/* Submit Button */}
           <GradientButton 
             onPress={postData} 
@@ -330,7 +329,8 @@ export default function AddPost() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#faf8ff",
+    //backgroundColor: "#faf8ff",
+    backgroundColor: "#ffffff"
   },
   scrollContainer: {
     flexGrow: 1,

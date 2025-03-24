@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
   },
   signOutText: {
     fontSize: 16,
-    color: "#8B44FF",
+    color: "#724C9D",
     fontWeight: '500',
   },
 });

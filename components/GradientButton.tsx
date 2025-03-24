@@ -26,7 +26,7 @@ const styles= StyleSheet.create({
         paddingHorizontal: 24,
         width: "100%",
         alignItems: "center",
-        backgroundColor:"#8B44FF",
+        backgroundColor:"#724C9D",
     },
     buttonDisabled: {
         backgroundColor: 'rgba(139, 68, 255, 0.5)',
