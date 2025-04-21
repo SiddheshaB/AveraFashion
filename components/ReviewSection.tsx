@@ -12,6 +12,7 @@ import {
 import { supabase } from '../utils/supabase';
 import { useSelector } from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';
+import GradientButton from './GradientButton';
 
 /**
  * StarRating Component
@@ -312,7 +313,12 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
             multiline
             numberOfLines={4}
           />
-          <TouchableOpacity
+           <GradientButton 
+            onPress={addReview} 
+            title="Post for Review" 
+            disabled={isLoading || !rating}
+          />
+          {/* <TouchableOpacity
             style={[
               styles.submitButton,
               (!rating) && styles.submitButtonDisabled,
@@ -325,7 +331,7 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
             ) : (
               <Text style={styles.submitButtonText}>Post Review</Text>
             )}
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       )}
 
