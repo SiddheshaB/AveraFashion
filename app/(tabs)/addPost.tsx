@@ -317,7 +317,7 @@ export default function AddPost() {
           {/* Submit Button */}
           <GradientButton 
             onPress={postData} 
-            title="Post for Review" 
+            title="Submit" 
             disabled={!isSubmitEnabled}
           />
         </View>

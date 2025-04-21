@@ -39,7 +39,7 @@ const styles= StyleSheet.create({
         textAlign: 'center',
     },
     buttonTextDisabled: {
-        color: '#e0e0e0',
+        color: '#fff',
     }
 })
 export default GradientButton;
