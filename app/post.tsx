@@ -22,6 +22,7 @@ import ReviewSection from '../components/ReviewSection';
 import { FontAwesome } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
 import ImageViewer from '../components/ImageViewer';
+import ImageTopCropper from '../components/ImageTopCropper';
 
 export default function PostScreen() {
   // Get post data from URL parameters and parse JSON
@@ -61,10 +62,11 @@ export default function PostScreen() {
                         style={styles.slide}
                         onPress={() => setSelectedImage(uri)}
                       >
-                        <Image
-                          source={{ uri }}
-                          style={styles.image}
-                          resizeMode="cover"
+                        <ImageTopCropper
+                          uri={uri}
+                          width={Dimensions.get('window').width}
+                          height={Dimensions.get('window').height * 0.5}
+                          style={{ width: '100%', height: '100%' }}
                         />
                       </TouchableOpacity>
                     ))}
@@ -225,10 +227,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  image: {
-    width: screenWidth,
-    height: '100%',
   },
   // Pagination Dots
   dot: {

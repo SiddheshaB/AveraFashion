@@ -7,6 +7,7 @@ import Swiper from "react-native-swiper";
 import { useSelector } from "react-redux";
 import { useRouter } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
+import ImageTopCropper from "./ImageTopCropper";
 
 // Define the Post type for TypeScript type checking
 type Post = {
@@ -302,8 +303,10 @@ export default function DisplayAllPosts() {
                           params: { post: JSON.stringify(item) }
                         })}
                       >
-                        <Image
-                          source={{ uri }}
+                        <ImageTopCropper
+                          uri={uri}
+                          width={Dimensions.get('window').width - 24}
+                          height={Dimensions.get('window').height * 0.5}
                           style={styles.image}
                         />
                         {/* Delete Icon - Only visible in My Posts and if user is the post owner */}
