@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   FlatList,
   Alert,
+  Linking
 } from 'react-native';
 import { supabase } from '../utils/supabase';
 import { useSelector } from 'react-redux';
@@ -103,6 +104,7 @@ type Review = {
 type ReviewSectionProps = {
   postId: string;  // ID of the post to show reviews for
   postOwnerId: string;  // ID of the post owner
+  handleReportReview?: (reviewId: string) => void; // Optional handler for reporting reviews
 };
 
 /**
@@ -110,7 +112,7 @@ type ReviewSectionProps = {
  * Displays a list of reviews for a post and allows users to add new reviews
  * Post owner cannot review their own post
  */
-export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProps) {
+export default function ReviewSection({ postId, postOwnerId, handleReportReview }: ReviewSectionProps) {
   // State Management
   const [reviews, setReviews] = useState<Review[]>([]);
   const [newReview, setNewReview] = useState('');
@@ -373,6 +375,14 @@ export default function ReviewSection({ postId, postOwnerId }: ReviewSectionProp
                       )}
                     </View>
                     <Text style={styles.reviewContent}>{item.review}</Text>
+                    {handleReportReview && (
+                      <TouchableOpacity
+                        style={styles.reportLink}
+                        onPress={() => handleReportReview(item.id)}
+                      >
+                        <FontAwesome name="flag" size={16} color="#666" />
+                      </TouchableOpacity>
+                    )}
                   </View>
                 </View>
               )}
@@ -496,6 +506,16 @@ const styles = StyleSheet.create({
   deleteButton: {
     padding: 4,
     marginLeft: 10,
+  },
+  reportLink: {
+    padding: 4,
+    marginTop: 8,
+    alignSelf: 'flex-end',
+  },
+  reportText: {
+    fontSize: 12,
+    color: '#666',
+    textDecorationLine: 'underline',
   },
   userName: {
     fontWeight: '600',

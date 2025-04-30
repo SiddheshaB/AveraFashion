@@ -15,6 +15,8 @@ import {
   Dimensions,
   SectionList,
   TouchableOpacity,
+  Alert,
+  Linking
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -36,6 +38,92 @@ export default function PostScreen() {
   const isPostOwner = user?.user?.id === postData.user_id;
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  // Handle reporting a post
+  const handleReportPost = (postId: string) => {
+    Alert.alert(
+      "Report Post",
+      "Would you like to report this post for inappropriate content?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Report",
+          style: "destructive",
+          onPress: () => {
+            // Support email address
+            const supportEmail = 'connect.avera@gmail.com';
+            const subject = encodeURIComponent("Report Post - Content Violation");
+            const body = encodeURIComponent(
+              `I would like to report a post that may violate Avera's content policies.\n\n` +
+              `Post ID: ${postId}\n\n` +
+              `Please review this content according to the content moderation guidelines.`
+            );
+            
+            const mailtoUrl = `mailto:${supportEmail}?subject=${subject}&body=${body}`;
+            
+            Linking.canOpenURL(mailtoUrl)
+              .then(supported => {
+                if (supported) {
+                  return Linking.openURL(mailtoUrl);
+                } else {
+                  Alert.alert("Error", "Unable to open email client. Please email connect.avera@gmail.com directly.");
+                }
+              })
+              .catch(error => {
+                console.error("Error opening email client:", error);
+                Alert.alert("Error", "Unable to open email client. Please email connect.avera@gmail.com directly.");
+              });
+          }
+        }
+      ]
+    );
+  };
+
+  // Handle reporting a review
+  const handleReportReview = (reviewId: string) => {
+    Alert.alert(
+      "Report Review",
+      "Would you like to report this review for inappropriate content?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Report",
+          style: "destructive",
+          onPress: () => {
+            // Support email address
+            const supportEmail = 'connect.avera@gmail.com';
+            const subject = encodeURIComponent("Report Review - Content Violation");
+            const body = encodeURIComponent(
+              `I would like to report a review that may violate Avera's content policies.\n\n` +
+              `Review ID: ${reviewId}\n\n` +
+              `Please review this content according to the content moderation guidelines.`
+            );
+            
+            const mailtoUrl = `mailto:${supportEmail}?subject=${subject}&body=${body}`;
+            
+            Linking.canOpenURL(mailtoUrl)
+              .then(supported => {
+                if (supported) {
+                  return Linking.openURL(mailtoUrl);
+                } else {
+                  Alert.alert("Error", "Unable to open email client. Please email connect.avera@gmail.com directly.");
+                }
+              })
+              .catch(error => {
+                console.error("Error opening email client:", error);
+                Alert.alert("Error", "Unable to open email client. Please email connect.avera@gmail.com directly.");
+              });
+          }
+        }
+      ]
+    );
+  };
 
   // Organize post content into sections for SectionList
   const sections = [
@@ -92,14 +180,16 @@ export default function PostScreen() {
                   />
                   <Text style={styles.fullName}>{postData.profiles.full_name}</Text>
                 </TouchableOpacity>
-                <View style={styles.occasionCapsule}>
-                  <Text style={styles.occasionText}>{postData.occasion.name}</Text>
+                <View style={styles.rightActions}>
+                  <View style={styles.occasionCapsule}>
+                    <Text style={styles.occasionText}>{postData.occasion.name}</Text>
+                  </View>
                 </View>
               </View>
 
               {/* Post Description */}
               <View style={styles.contentSection}>
-                <Text style={styles.content}>{postData.content}</Text>
+                <Text style={styles.postContent}>{postData.content}</Text>
               </View>
 
               {/* AI Feedback Card - Only visible to post owner */}
@@ -127,6 +217,7 @@ export default function PostScreen() {
               <ReviewSection 
                 postId={postData.post_id} 
                 postOwnerId={postData.user_id}
+                handleReportReview={handleReportReview}
               />
             </View>
             <ImageViewer
@@ -134,6 +225,14 @@ export default function PostScreen() {
               imageUrl={selectedImage || ''}
               onClose={() => setSelectedImage(null)}
             />
+            
+            {/* Report Post Link - At the very bottom */}
+            <TouchableOpacity
+              style={styles.reportPostLink}
+              onPress={() => handleReportPost(postData.post_id)}
+            >
+              <Text style={styles.reportText}>Report Post</Text>
+            </TouchableOpacity>
           </>
         )
       }]
@@ -190,11 +289,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#000',
   },
+  rightActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   occasionCapsule: {
     backgroundColor: '#ECEFF1',
     paddingHorizontal: 9,
     paddingVertical: 3,
     borderRadius: 4,
+    marginRight: 8,
   },
   occasionText: {
     fontSize: 11,
@@ -208,7 +312,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 16,
   },
-  content: {
+  postContent: {
     fontSize: 13,
     lineHeight: 20,
     color: '#333',
@@ -281,5 +385,16 @@ const styles = StyleSheet.create({
     color: '#8B44FF',
     marginTop: 4,
     fontWeight: '500',
+  },
+  reportPostLink: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#f8f8f8',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  reportText: {
+    fontSize: 13,
+    color: '#666',
   },
 });
