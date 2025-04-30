@@ -309,8 +309,8 @@ export default function DisplayAllPosts() {
                           height={Dimensions.get('window').height * 0.5}
                           style={styles.image}
                         />
-                        {/* Delete Icon - Only visible in My Posts and if user is the post owner */}
-                        {selectedFilter === "my" && user?.user?.id === item.user_id && (
+                        {/* Delete Icon - Only visible if user is the post owner */}
+                        {user?.user?.id === item.user_id && (
                           <TouchableOpacity 
                             style={styles.deleteButton}
                             onPress={() => handleDeletePost(item.post_id)}
