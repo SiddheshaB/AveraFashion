@@ -1,7 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, View } from "react-native";
 
-const GradientButton = ({title, onPress, disabled}:any) => {
+const GradientButton = ({title, onPress, disabled, isLoading, loadingText = "Posting..."}:any) => {
     return (
         <TouchableOpacity 
             onPress={onPress} 
@@ -9,12 +9,19 @@ const GradientButton = ({title, onPress, disabled}:any) => {
                 styles.button,
                 disabled && styles.buttonDisabled
             ]}
-            disabled={disabled}
+            disabled={disabled || isLoading}
         >
-            <Text style={[
-                styles.buttonText,
-                disabled && styles.buttonTextDisabled
-            ]}>{title}</Text>
+            {isLoading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="small" color="#fff" />
+                    <Text style={[styles.buttonText, styles.loadingText]}>{loadingText}</Text>
+                </View>
+            ) : (
+                <Text style={[
+                    styles.buttonText,
+                    disabled && styles.buttonTextDisabled
+                ]}>{title}</Text>
+            )}
         </TouchableOpacity>
     );
 }
@@ -40,6 +47,14 @@ const styles= StyleSheet.create({
     },
     buttonTextDisabled: {
         color: '#fff',
+    },
+    loadingContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    loadingText: {
+        marginLeft: 8,
     }
 })
 export default GradientButton;

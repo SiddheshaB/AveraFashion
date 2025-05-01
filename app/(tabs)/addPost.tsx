@@ -9,6 +9,8 @@ import {
   TouchableOpacity,
   Modal,
   TouchableWithoutFeedback,
+  ToastAndroid,
+  Platform,
 } from "react-native";
 
 import { uploadToSupabase } from "../../components/SupabaseImageUpload";
@@ -24,6 +26,17 @@ import { supabase } from "../../utils/supabase";
 // Maximum number of images that can be uploaded
 const MAX_IMAGES = 3;
 const MAX_CHARS = 200;
+
+// Custom toast function that works on both platforms
+const showToast = (message: string) => {
+  if (Platform.OS === 'android') {
+    ToastAndroid.show(message, ToastAndroid.LONG);
+  } else {
+    // For iOS, just log to console for now
+    console.log(message);
+  }
+};
+
 // Handle image selection from device library
 const pickImage = async (setImageUri:any, imageUri:any) => {
   // Request permission to access media library
@@ -59,6 +72,7 @@ export default function AddPost() {
   // State management for images, loading state, and form inputs
   const [imageUri, setImageUri] = useState<any>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [occasions, setOccasions] = useState<Array<{ id: number; name: string }>>([]);
@@ -143,18 +157,32 @@ export default function AddPost() {
       return;
     }
     
-    // Upload images to Supabase storage
-    const supabaseDownloadURL = await uploadToSupabase(imageUri);
-    console.log("supabase download img: ", supabaseDownloadURL);
-    
-    // Upload post data to database
-    postDataUpload(title, content, supabaseDownloadURL, selectedOccasion);
-    
-    // Reset form after successful upload
-    setTitle('');
-    setContent('');
-    setImageUri('');
-    setSelectedOccasion(null);
+    try {
+      // Set uploading state to show loading indicator
+      setIsUploading(true);
+      
+      // Upload images to Supabase storage
+      const supabaseDownloadURL = await uploadToSupabase(imageUri);
+      console.log("supabase download img: ", supabaseDownloadURL);
+      
+      // Upload post data to database
+      await postDataUpload(title, content, supabaseDownloadURL, selectedOccasion);
+      
+      // Reset form after successful upload
+      setTitle('');
+      setContent('');
+      setImageUri([]);
+      setSelectedOccasion(null);
+      
+      // Show success message
+      showToast('Your post has been uploaded successfully!');
+    } catch (error) {
+      console.error("Error uploading post:", error);
+      showToast("Error uploading post. Please try again.");
+    } finally {
+      // Reset uploading state
+      setIsUploading(false);
+    }
   };
 
   // Close dropdown when clicking outside
@@ -319,6 +347,7 @@ export default function AddPost() {
             onPress={postData} 
             title="Submit" 
             disabled={!isSubmitEnabled}
+            isLoading={isUploading}
           />
         </View>
       </ScrollView>
