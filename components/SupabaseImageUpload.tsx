@@ -1,11 +1,16 @@
 import { supabase } from "../utils/supabase";
 import { decode } from "base64-arraybuffer";
 import * as FileSystem from "expo-file-system";
-export const uploadToSupabase = async (uris: any) => {
-  const publicUrlArray = [];
+import { compressImages } from "../utils/ImageCompression";
+
+export const uploadToSupabase = async (uris: string[]) => {
+  const publicUrlArray: string[] = [];
   try {
+    // Compress images before uploading
+    const compressedUris = await compressImages(uris);
+    
     await Promise.all(
-      uris.map(async (uri) => {
+      compressedUris.map(async (uri) => {
     //for (const uri of uris) {
 
       const filename = uri.split("/").pop();
