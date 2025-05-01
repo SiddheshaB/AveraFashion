@@ -26,7 +26,7 @@ export default function SignIn() {
     >
       <View style={styles.contentContainer}>
         <Text style={[styles.title, { fontFamily: 'Sofia_400Regular' }]}>Avera</Text>
-        <Text style={styles.subtitle}>Style Your Story</Text>
+        <Text style={styles.subtitle}>Style Your Way</Text>
         <View style={styles.loginContainer}>
           <Text style={styles.welcomeText}>Welcome</Text>
           <LoginButton />

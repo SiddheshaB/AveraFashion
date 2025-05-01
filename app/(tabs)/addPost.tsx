@@ -204,7 +204,7 @@ export default function AddPost() {
           </View>
           <View style={styles.reviewTextContainer}>
             <Text style={styles.title}>Free AI Review</Text>
-            <Text style={styles.subtitle}>Get personalized style feedback from our AI stylist</Text>
+            <Text style={styles.subtitle}>Our AI stylist will provide personalized fashion insights on your outfit right after you post!</Text>
           </View>
         </View>
 
@@ -327,14 +327,14 @@ export default function AddPost() {
           )}
 
           {/* Description Input */}
-          <Text style={styles.sectionTitle}>Description</Text>
+          <Text style={styles.sectionTitle}>Style Story</Text>
           <View style={styles.inputContainer}>
           <TextInput
             editable
             multiline
             //numberOfLines={4}
             maxLength={MAX_CHARS}
-            placeholder="Tell us about your outfit and get personalized feedback..."
+            placeholder="Tell us about your outfit and occasion to get personalized feedback..."
             style={styles.postContent}
             onChangeText={(text) => setContent(text)}
             value={content}
