@@ -10,9 +10,9 @@
   
 ✅ User Experience: Modern responsive UI, Image optimization, Smooth navigation, Loading states and feedback
 
-![feed](https://github.com/user-attachments/assets/904f0c08-e395-4db6-b0db-102c3e5c3b12)  ![profile](https://github.com/user-attachments/assets/20fde0d4-a61e-481e-9900-dd0a6a4dfe7e) 
+<img src="https://github.com/SiddheshaB/AveraFashion/blob/main/images/Feed.jpg?raw=true" width="321" height="669" alt="Feed" />  <img src="https://github.com/SiddheshaB/AveraFashion/blob/main/images/Profile.jpg?raw=true" width="321" height="669" alt="Profile" />
 
-![reviews](https://github.com/user-attachments/assets/86fdfe7e-ab8a-47eb-8d86-63b81d6f7aa4)  ![add post](https://github.com/user-attachments/assets/3c829faa-a0b4-4aed-98cb-7fb330537680)
+<img src="https://github.com/SiddheshaB/AveraFashion/blob/main/images/AddPost.jpg?raw=true" width="321" height="669" alt="AddPost" />  <img src="https://github.com/SiddheshaB/AveraFashion/blob/main/images/Reviews.jpg?raw=true" width="321" height="669" alt="Reviews" />
 
 
 
